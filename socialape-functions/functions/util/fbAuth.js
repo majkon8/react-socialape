@@ -23,6 +23,8 @@ module.exports = (req, res, next) => {
         .get();
     })
     .then(data => {
+      req.user.followers = data.docs[0].data().followers;
+      req.user.following = data.docs[0].data().following;
       req.user.handle = data.docs[0].data().handle;
       req.user.imageUrl = data.docs[0].data().imageUrl;
       return next();

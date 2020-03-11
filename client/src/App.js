@@ -19,11 +19,13 @@ import { logoutUser, getUserData } from "./redux/actions/userActions";
 // Components
 import Navbar from "./components/layout/Navbar";
 import AuthRoute from "./util/AuthRoute";
+import UnauthRoute from "./util/UnauthRoute";
 // Pages
 import home from "./pages/home";
 import login from "./pages/login";
 import signup from "./pages/signup";
 import user from "./pages/user";
+import follows from "./pages/follows";
 
 const theme = createMuiTheme(themeFile);
 
@@ -51,9 +53,19 @@ function App() {
           <Navbar></Navbar>
           <div className="container">
             <Switch>
-              <AuthRoute exact path="/" component={home} />
+              <UnauthRoute exact path="/" component={home} />
               <AuthRoute exact path="/login" component={login} />
               <AuthRoute exact path="/signup" component={signup} />
+              <UnauthRoute
+                exact
+                path="/users/:handle/followers"
+                component={follows}
+              />
+              <UnauthRoute
+                exact
+                path="/users/:handle/following"
+                component={follows}
+              />
               <Route exact path="/users/:handle" component={user} />
               <Route
                 exact

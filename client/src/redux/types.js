@@ -22,3 +22,5 @@ export const POST_SCREAM = "POST_SCREAM";
 export const SUBMIT_COMMENT = "SUBMIT_COMMENT";
 export const SET_PROFILE = "SET_PROFILE";
 export const DELETE_COMMENT = "DELETE_COMMENT";
+export const SET_FOLLOWERS = "SET_FOLLOWERS";
+export const SET_FOLLOWING = "SET_FOLLOWING";

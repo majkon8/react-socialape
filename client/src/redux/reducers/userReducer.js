@@ -9,7 +9,6 @@ import {
   FOLLOW,
   UNFOLLOW
 } from "../types";
-import { setProfile } from "../actions/dataActions";
 
 const initialState = {
   authenticated: false,
@@ -56,7 +55,6 @@ export default function(state = initialState, action) {
         })
       };
     case FOLLOW:
-      setProfile();
       return { ...state, credentials: { ...action.payload } };
     case UNFOLLOW:
       return { ...state, credentials: { ...action.payload } };

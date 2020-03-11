@@ -8,10 +8,19 @@ import {
   SET_SCREAM,
   SUBMIT_COMMENT,
   SET_PROFILE,
-  DELETE_COMMENT
+  DELETE_COMMENT,
+  SET_FOLLOWERS,
+  SET_FOLLOWING
 } from "../types";
 
-const initialState = { screams: [], scream: {}, loading: false, profile: null };
+const initialState = {
+  screams: [],
+  scream: {},
+  loading: false,
+  profile: null,
+  followersDetails: null,
+  followingUsersDetails: null
+};
 
 export default function(state = initialState, action) {
   let updatedScream;
@@ -73,6 +82,14 @@ export default function(state = initialState, action) {
           return { ...scream };
         }),
         scream: updatedScream
+      };
+    case SET_FOLLOWERS:
+      return { ...state, followersDetails: action.payload, loading: false };
+    case SET_FOLLOWING:
+      return {
+        ...state,
+        followingUsersDetails: action.payload,
+        loading: false
       };
     default:
       return state;

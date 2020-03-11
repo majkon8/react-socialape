@@ -111,12 +111,12 @@ exports.getUserDetails = (req, res) => {
     })
     .then(data => {
       userData.screams = [];
-      data.forEach(doc => {
+      data.forEach(doc =>
         userData.screams.push({
           ...doc.data(),
           screamId: doc.id
-        });
-      });
+        })
+      );
       return res.json(userData);
     })
     .catch(err => {
@@ -141,9 +141,7 @@ exports.getAuthenticatedUser = (req, res) => {
     })
     .then(data => {
       userData.likes = [];
-      data.forEach(doc => {
-        userData.likes.push(doc.data());
-      });
+      data.forEach(doc => userData.likes.push(doc.data()));
       return db
         .collection("notifications")
         .where("recipient", "==", req.user.handle)
@@ -153,12 +151,12 @@ exports.getAuthenticatedUser = (req, res) => {
     })
     .then(data => {
       userData.notifications = [];
-      data.forEach(doc => {
+      data.forEach(doc =>
         userData.notifications.push({
           ...doc.data(),
           notificationId: doc.id
-        });
-      });
+        })
+      );
       return res.json(userData);
     })
     .catch(err => {
@@ -236,11 +234,11 @@ exports.follow = (req, res) => {
   const userDocument = db.doc(`/users/${userHandle}`);
   let userData;
   if (userToFollow === userHandle)
-    return res.json(400).json({ error: "Cannot follow the user" });
+    return res.status(400).json({ error: "Cannot follow the user" });
   userToFollowDoc
     .get()
     .then(doc => {
-      if (!doc.exists) return res.json(404).json({ error: "User not found" });
+      if (!doc.exists) return res.status(404).json({ error: "User not found" });
       else {
         const userToFollowData = doc.data();
         if (userToFollowData.followers.includes(userHandle))
@@ -274,11 +272,11 @@ exports.unfollow = (req, res) => {
   userToUnfollowDoc
     .get()
     .then(doc => {
-      if (!doc.exists) return res.json(404).json({ error: "User not found" });
+      if (!doc.exists) return res.status(404).json({ error: "User not found" });
       else {
         const userToUnfollowData = doc.data();
         if (!userToUnfollowData.followers.includes(userHandle))
-          return res.json(400).json({ error: "User not followed" });
+          return res.status(400).json({ error: "User not followed" });
         userToUnfollowData.followers = userToUnfollowData.followers.filter(
           handle => handle !== userHandle
         );
@@ -296,6 +294,34 @@ exports.unfollow = (req, res) => {
       return userDocument.update({ following: [...userData.following] });
     })
     .then(() => res.json(userData))
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ error: err.code });
+    });
+};
+
+// Get followers detais
+exports.getFollowUsersDetails = (req, res, type) => {
+  const userHandle = req.params.handle;
+  const userDocument = db.doc(`/users/${userHandle}`);
+  let followUsersHandles;
+  let followUsersDetails = [];
+  userDocument
+    .get()
+    .then(doc => {
+      if (!doc.exists) return res.status(404).json({ error: "User not found" });
+      followUsersHandles =
+        type === "followers" ? doc.data().followers : doc.data().following;
+      if (followUsersHandles.length === 0) return res.json([]);
+      return db
+        .collection("users")
+        .where("handle", "in", followUsersHandles)
+        .get();
+    })
+    .then(data => {
+      data.forEach(doc => followUsersDetails.push(doc.data()));
+      res.json(followUsersDetails);
+    })
     .catch(err => {
       console.error(err);
       res.status(500).json({ error: err.code });

@@ -6,15 +6,16 @@ import dayjs from "dayjs";
 import EditDetails from "./EditDetails";
 import ProfileSkeleton from "../../util/ProfileSkeleton";
 import numeral from "numeral";
-// MUI stuff
+// MUI
 import Paper from "@material-ui/core/Paper";
 import MuiLink from "@material-ui/core/link";
 import Typography from "@material-ui/core/Typography";
+import Tooltip from "@material-ui/core/Tooltip";
 // Icons
 import LocationOn from "@material-ui/icons/LocationOn";
 import LinkIcon from "@material-ui/icons/Link";
 import CalendarToday from "@material-ui/icons/CalendarToday";
-// Redux stuff
+// Redux
 import { connect } from "react-redux";
 import { logoutUser } from "../../redux/actions/userActions";
 
@@ -83,28 +84,41 @@ export class Profile extends Component {
             <span>Joined {dayjs(createdAt).format("MMM YYYY")}</span>
             <hr />
             <div>
-              <span style={{ marginRight: 20 }}>
-                <span className="follow-number">
-                  {followers.length < 10000
-                    ? followers.length
-                    : numeral(followers.length).format("0.00a", Math.floor)}
-                </span>{" "}
-                <span>followers</span>
-              </span>
-              <span>
-                <span className="follow-number">
-                  {following.length < 10000
-                    ? following.length
-                    : numeral(following.length).format("0.00a", Math.floor)}
-                </span>{" "}
-                <span>following</span>
-              </span>
+              <Tooltip title={followers.length}>
+                <MuiLink
+                  component={Link}
+                  to={`/users/${handle}/followers`}
+                  style={{
+                    marginRight: 20,
+                    color: "unset",
+                    textDecoration: "none"
+                  }}
+                >
+                  <span className="follow-number">
+                    {followers.length < 10000
+                      ? followers.length
+                      : numeral(followers.length).format("0.00a", Math.floor)}
+                  </span>{" "}
+                  <span>followers</span>
+                </MuiLink>
+              </Tooltip>
+              <Tooltip title={following.length}>
+                <MuiLink
+                  component={Link}
+                  to={`/users/${handle}/following`}
+                  style={{ color: "unset", textDecoration: "none" }}
+                >
+                  <span className="follow-number">
+                    {following.length < 10000
+                      ? following.length
+                      : numeral(following.length).format("0.00a", Math.floor)}
+                  </span>{" "}
+                  <span>following</span>
+                </MuiLink>
+              </Tooltip>
             </div>
           </div>
         </div>
-        {/* <MyButton tip="Logout" onClick={this.handleLogout}>
-            <KeyboardReturn color="primary" />
-          </MyButton> */}
       </Paper>
     ) : (
       <ProfileSkeleton />

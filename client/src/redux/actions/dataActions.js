@@ -12,7 +12,9 @@ import {
   STOP_LOADING_UI,
   SUBMIT_COMMENT,
   SET_PROFILE,
-  DELETE_COMMENT
+  DELETE_COMMENT,
+  SET_FOLLOWERS,
+  SET_FOLLOWING
 } from "../types";
 import axios from "axios";
 
@@ -114,8 +116,30 @@ export const getUserData = userHandle => dispatch => {
     .catch(() => dispatch({ type: SET_SCREAMS, payload: null }));
 };
 
+// Set selected profile
 export const setProfile = payload => dispatch =>
   dispatch({ type: SET_PROFILE, payload: payload });
+
+// Get followers or following users details
+export const getFollowUsers = (userHandle, type) => dispatch => {
+  dispatch({ type: LOADING_DATA });
+  axios
+    .get(`/user/${userHandle}/${type}`)
+    .then(res => {
+      type === "followers"
+        ? dispatch(setFollowers(res.data))
+        : dispatch(setFollowing(res.data));
+    })
+    .catch(err => console.log(err));
+};
+
+// Set followers details
+export const setFollowers = payload => dispatch =>
+  dispatch({ type: SET_FOLLOWERS, payload: payload });
+
+// Set following users details
+export const setFollowing = payload => dispatch =>
+  dispatch({ type: SET_FOLLOWING, payload: payload });
 
 // Clear errors
 export const clearErrors = () => dispatch => dispatch({ type: CLEAR_ERRORS });
