@@ -39,8 +39,7 @@ export default {
       "& .follow-number": { color: "#d84315", fontWeight: "bold" },
       "& .profile-handle": { textAlign: "center" },
       "& .profile-details": {
-        textAlign: "left",
-        marginLeft: 56,
+        textAlign: "center",
         "& span, svg": { verticalAlign: "middle" },
         "& a": { color: "#00bcd4" }
       },

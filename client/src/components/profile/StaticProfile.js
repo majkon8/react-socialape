@@ -29,7 +29,6 @@ function usePrevious(value) {
 }
 
 const StaticProfile = ({
-  hideInfo = false,
   setProfile,
   classes,
   profile,
@@ -86,16 +85,16 @@ const StaticProfile = ({
         </div>
         <hr />
         <div className="profile-details">
-          {!hideInfo && bio && <Typography variant="body2">{bio}</Typography>}
+          {bio && <Typography variant="body2">{bio}</Typography>}
           <hr />
-          {!hideInfo && location && (
+          {location && (
             <>
               <LocationOn color="primary" />
               <span>{location}</span>
               <hr />
             </>
           )}
-          {!hideInfo && website && (
+          {website && (
             <>
               <LinkIcon color="primary" />
               <a href={website} target="_blank" rel="noopener noreferrer">

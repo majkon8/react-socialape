@@ -10,15 +10,27 @@ import {
 } from "../redux/actions/dataActions";
 
 export class follows extends Component {
-  state = { followType: "" };
+  state = { type: "" };
 
   componentDidMount() {
     const handle = this.props.match.params.handle;
     let type;
     if (this.props.match.path.includes("followers")) type = "followers";
     else if (this.props.match.path.includes("following")) type = "following";
-    this.setState({ followType: type });
+    this.setState({ type });
     this.props.getFollowUsers(handle, type);
+  }
+
+  componentDidUpdate(prevProps) {
+    const prevHandle = prevProps.match.params.handle;
+    const handle = this.props.match.params.handle;
+    let type;
+    if (this.props.match.path.includes("followers")) type = "followers";
+    else if (this.props.match.path.includes("following")) type = "following";
+    if (handle !== prevHandle) {
+      this.props.getFollowUsers(handle, type);
+      this.setState({ type });
+    }
   }
 
   componentWillUnmount() {
@@ -32,9 +44,9 @@ export class follows extends Component {
       followingUsersDetails,
       loading
     } = this.props.data;
-    const { followType } = this.state;
+    const { type } = this.state;
     const usersToDisplay =
-      followType === "followers" ? followersDetails : followingUsersDetails;
+      type === "followers" ? followersDetails : followingUsersDetails;
     return <ProfilesDisplay users={usersToDisplay} loading={loading} />;
   }
 }
