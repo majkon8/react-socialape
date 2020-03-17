@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Scream from "../components/scream/Scream";
 import Profile from "../components/profile/Profile";
 import PropTypes from "prop-types";
-import ScreamSkeleton from "../util/ScreamSkeleton";
+import ScreamSkeleton from "../components/util/ScreamSkeleton";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";

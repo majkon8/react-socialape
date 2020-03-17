@@ -20,7 +20,8 @@ const {
   markNotificationsRead,
   follow,
   unfollow,
-  getFollowUsersDetails
+  getFollowUsersDetails,
+  searchForUser
 } = require("./handlers/users");
 const {
   handleCreateNotificationOnLike,
@@ -65,6 +66,7 @@ app.get("/user/:handle/followers", FBAuth, (req, res) =>
 app.get("/user/:handle/following", FBAuth, (req, res) =>
   getFollowUsersDetails(req, res, "following")
 );
+app.get("/user/search/:name", FBAuth, searchForUser);
 
 exports.api = functions.region("europe-west1").https.onRequest(app);
 

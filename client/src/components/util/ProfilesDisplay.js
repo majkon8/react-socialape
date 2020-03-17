@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import StaticProfile from "../components/profile/StaticProfile";
+import StaticProfile from "../profile/StaticProfile";
 import ProfileSkeleton from "./ProfileSkeleton";
 import Masonry from "react-masonry-css";
 

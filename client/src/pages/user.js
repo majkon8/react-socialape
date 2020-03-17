@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Scream from "../components/scream/Scream";
 import StaticProfile from "../components/profile/StaticProfile";
-import ScreamSkeleton from "../util/ScreamSkeleton";
-import ProfileSkeleton from "../util/ProfileSkeleton";
+import ScreamSkeleton from "../components/util/ScreamSkeleton";
+import ProfileSkeleton from "../components/util/ProfileSkeleton";
 // MUI
 import Grid from "@material-ui/core/Grid";
 // Redux

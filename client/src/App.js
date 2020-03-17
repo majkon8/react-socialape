@@ -8,7 +8,7 @@ import {
 import "./App.css";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
-import themeFile from "./util/theme";
+import themeFile from "./theme";
 import jwtDecode from "jwt-decode";
 import axios from "axios";
 //Redux
@@ -18,14 +18,15 @@ import { SET_AUTHENTICATED } from "./redux/types";
 import { logoutUser, getUserData } from "./redux/actions/userActions";
 // Components
 import Navbar from "./components/layout/Navbar";
-import AuthRoute from "./util/AuthRoute";
-import UnauthRoute from "./util/UnauthRoute";
+import AuthRoute from "./components/util/AuthRoute";
+import UnauthRoute from "./components/util/UnauthRoute";
 // Pages
 import home from "./pages/home";
 import login from "./pages/login";
 import signup from "./pages/signup";
 import user from "./pages/user";
 import follows from "./pages/follows";
+import search from "./pages/search";
 
 const theme = createMuiTheme(themeFile);
 
@@ -65,6 +66,11 @@ function App() {
                 exact
                 path="/users/:handle/following"
                 component={follows}
+              />
+              <UnauthRoute
+                exact
+                path="/users/search/:name"
+                component={search}
               />
               <Route exact path="/users/:handle" component={user} />
               <Route

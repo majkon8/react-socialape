@@ -14,7 +14,8 @@ import {
   SET_PROFILE,
   DELETE_COMMENT,
   SET_FOLLOWERS,
-  SET_FOLLOWING
+  SET_FOLLOWING,
+  SET_SEARCHED_USERS
 } from "../types";
 import axios from "axios";
 
@@ -132,6 +133,18 @@ export const getFollowUsers = (userHandle, type) => dispatch => {
     })
     .catch(err => console.log(err));
 };
+
+// Search for users
+export const searchForUsers = name => dispatch => {
+  dispatch({ type: LOADING_DATA });
+  axios
+    .get(`/user/search/${name}`)
+    .then(res => dispatch(setSearchedUsers(res.data)))
+    .catch(err => console.log(err));
+};
+
+export const setSearchedUsers = payload => dispatch =>
+  dispatch({ type: SET_SEARCHED_USERS, payload: payload });
 
 // Set followers details
 export const setFollowers = payload => dispatch =>

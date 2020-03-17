@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import numeral from "numeral";
-import Follow from "../../util/Follow";
+import Follow from "../util/Follow";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
 import MuiLink from "@material-ui/core/Link";

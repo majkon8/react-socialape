@@ -1,40 +1,26 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import MyButton from "../../util/MyButton";
+import MyButton from "../util/MyButton";
 import PostScream from "../scream/PostScream";
 import Notifications from "./Notifications";
 import withStyles from "@material-ui/core/styles/withStyles";
+import Search from "../util/Search";
 // MUI
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
 // Icons
 import HomeIcon from "@material-ui/icons/Home";
 // Redux
 import { connect } from "react-redux";
 import { clearErrors } from "../../redux/actions/dataActions";
 
-const styles = theme => ({
-  ...theme.spreadThis,
-  searchField: {
-    "& input.MuiTextField-root": { color: "white" },
-    "& label.MuiInputLabel-root": { color: "white" },
-    "& label.Mui-focused": { color: "#00bcd4" },
-    "& .MuiInput-underline:after": { borderBottomColor: "#00bcd4" },
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": { borderColor: "white" },
-      "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.7)" },
-      "&.Mui-focused fieldset": { borderColor: "#00bcd4" }
-    }
-  },
-  input: { color: "white" }
-});
+const styles = theme => ({ ...theme.spreadThis });
 
 export class Navbar extends Component {
   render() {
-    const { authenticated, clearErrors, classes } = this.props;
+    const { authenticated, clearErrors } = this.props;
 
     return (
       <AppBar>
@@ -48,19 +34,7 @@ export class Navbar extends Component {
                 </MyButton>
               </Link>
               <Notifications />
-              <TextField
-                size="small"
-                variant="outlined"
-                color="secondary"
-                name="search"
-                type="text"
-                label="Search"
-                fullWidth
-                className={classes.searchField}
-                InputProps={{
-                  className: classes.input
-                }}
-              />
+              <Search />
             </>
           ) : (
             <>
@@ -98,8 +72,7 @@ export class Navbar extends Component {
 
 Navbar.propTypes = {
   authenticated: PropTypes.bool.isRequired,
-  clearErrors: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired
+  clearErrors: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({ authenticated: state.user.authenticated });

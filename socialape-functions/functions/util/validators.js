@@ -9,14 +9,20 @@ const isEmail = email => {
   return false;
 };
 
+const handleRegEx = /^[a-zA-Z0-9_.-]*$/;
+
 exports.validateSignupData = data => {
   let errors = {};
-  if (isEmpty(data.email)) errors.email = "Must not be empty";
+  if (isEmpty(data.email.trim())) errors.email = "Must not be empty";
   else if (!isEmail(data.email)) errors.email = "Must be a valid email address";
   if (isEmpty(data.password)) errors.password = "Must not be empty";
-  if (data.password !== data.confirmPassword)
+  else if (data.password.length < 8) errors.password = "Minimum 8 characters";
+  else if (data.password !== data.confirmPassword)
     errors.confirmPassword = "Passwords must match";
-  if (isEmpty(data.handle)) errors.handle = "Must not be empty";
+  if (isEmpty(data.handle.trim())) errors.handle = "Must not be empty";
+  else if (data.handle.length < 3) errors.handle = "Minimum 3 characters";
+  else if (!handleRegEx.test(data.handle))
+    errors.handle = "Only letters, numbers and - . _ allowed";
   return {
     errors,
     valid: Object.keys(errors).length === 0 ? true : false

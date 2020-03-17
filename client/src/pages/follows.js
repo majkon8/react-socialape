@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import ProfilesDisplay from "../util/ProfilesDisplay";
+import ProfilesDisplay from "../components/util/ProfilesDisplay";
 // Redux
 import { connect } from "react-redux";
 import {
@@ -54,7 +54,8 @@ export class follows extends Component {
 follows.propTypes = {
   getFollowUsers: PropTypes.func.isRequired,
   setFollowers: PropTypes.func.isRequired,
-  setFollowing: PropTypes.func.isRequired
+  setFollowing: PropTypes.func.isRequired,
+  data: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({ data: state.data });

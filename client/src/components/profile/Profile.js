@@ -4,7 +4,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import EditDetails from "./EditDetails";
-import ProfileSkeleton from "../../util/ProfileSkeleton";
+import ProfileSkeleton from "../util/ProfileSkeleton";
 import numeral from "numeral";
 // MUI
 import Paper from "@material-ui/core/Paper";

@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 // Redux
 import { connect } from "react-redux";
-import { follow, unfollow } from "../redux/actions/userActions";
+import { follow, unfollow } from "../../redux/actions/userActions";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
 import Button from "@material-ui/core/Button";

@@ -327,3 +327,27 @@ exports.getFollowUsersDetails = (req, res, type) => {
       res.status(500).json({ error: err.code });
     });
 };
+
+// Search for a user by name
+exports.searchForUser = (req, res) => {
+  const nameToSearch = req.params.name.toLowerCase();
+  const searchedUsers = [];
+  db.collection("users")
+    .get()
+    .then(data => {
+      data.forEach(doc => {
+        if (
+          doc
+            .data()
+            .handle.toLowerCase()
+            .includes(nameToSearch)
+        )
+          searchedUsers.push(doc.data());
+      });
+      res.json(searchedUsers);
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ error: err.code });
+    });
+};

@@ -10,7 +10,8 @@ import {
   SET_PROFILE,
   DELETE_COMMENT,
   SET_FOLLOWERS,
-  SET_FOLLOWING
+  SET_FOLLOWING,
+  SET_SEARCHED_USERS
 } from "../types";
 
 const initialState = {
@@ -19,7 +20,8 @@ const initialState = {
   loading: false,
   profile: null,
   followersDetails: null,
-  followingUsersDetails: null
+  followingUsersDetails: null,
+  searchedUsers: null
 };
 
 export default function(state = initialState, action) {
@@ -91,6 +93,8 @@ export default function(state = initialState, action) {
         followingUsersDetails: action.payload,
         loading: false
       };
+    case SET_SEARCHED_USERS:
+      return { ...state, searchedUsers: action.payload, loading: false };
     default:
       return state;
   }

@@ -1,5 +1,5 @@
 import React from "react";
-import NoImg from "../images/no-image.png";
+import NoImg from "../../images/no-image.png";
 import PropTypes from "prop-types";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";

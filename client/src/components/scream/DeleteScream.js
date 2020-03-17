@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
 import PropTypes from "prop-types";
-import MyButton from "../../util/MyButton";
+import MyButton from "../util/MyButton";
 // MUI
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
