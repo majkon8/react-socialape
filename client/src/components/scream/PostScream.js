@@ -18,7 +18,7 @@ import CloseIcon from "@material-ui/icons/Close";
 
 const styles = theme => ({
   ...theme.spreadThis,
-  submitButton: { position: "relative", float: "right", marginTop: 10 },
+  submitButton: { position: "relative", float: "right" },
   progressSpinner: { position: "absolute" },
   closeButton: { position: "absolute", left: "91%", top: "6%" }
 });
@@ -43,8 +43,11 @@ class PostScream extends Component {
     this.setState({ open: false, body: "" });
   };
 
-  handleChange = event =>
+  handleChange = event => {
+    if (event.target.value.length > 280) return;
+    if (this.state.body === "" && event.target.value.trim() === "") return;
     this.setState({ [event.target.name]: event.target.value });
+  };
 
   handleSubmit = event => {
     event.preventDefault();
@@ -92,12 +95,18 @@ class PostScream extends Component {
                 value={body}
                 fullWidth
               />
+              <div>
+                Characters left:{" "}
+                <span style={{ color: body.length === 280 ? "red" : "green" }}>
+                  {280 - body.length}
+                </span>
+              </div>
               <Button
                 type="submit"
                 variant="contained"
                 color="primary"
                 className={classes.submitButton}
-                disabled={loading}
+                disabled={loading || body.trim() === ""}
               >
                 Submit
                 {loading && (

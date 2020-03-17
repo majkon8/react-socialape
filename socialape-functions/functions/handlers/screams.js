@@ -66,8 +66,10 @@ exports.getScream = (req, res) => {
 exports.postOneScream = (req, res) => {
   if (req.body.body.trim() === "")
     return res.status(400).json({ body: "Body must not be empty" });
+  if (req.body.body.length > 280)
+    return res.status(400).json({ body: "Too long scream content" });
   const newScream = {
-    body: req.body.body,
+    body: req.body.body.trim(),
     userHandle: req.user.handle,
     createdAt: new Date().toISOString(),
     userImage: req.user.imageUrl,

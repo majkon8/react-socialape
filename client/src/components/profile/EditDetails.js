@@ -34,6 +34,17 @@ export class EditDetails extends Component {
   };
 
   handleChange = event => {
+    if (event.target.name === "bio" && event.target.value.length > 80) return;
+    if (
+      this.state[event.target.name] === "" &&
+      event.target.value.trim() === ""
+    )
+      return;
+    if (
+      (event.target.name === "website" || event.target.name === "location") &&
+      event.target.value.length > 30
+    )
+      return;
     this.setState({ [event.target.name]: event.target.value });
   };
 
@@ -71,6 +82,7 @@ export class EditDetails extends Component {
 
   render() {
     const { classes } = this.props;
+    const { bio, website, location, open } = this.state;
     return (
       <>
         <MyButton
@@ -80,12 +92,7 @@ export class EditDetails extends Component {
         >
           <EditIcon color="primary" />
         </MyButton>
-        <Dialog
-          open={this.state.open}
-          onClose={this.handleClose}
-          fullWidth
-          maxWidth="sm"
-        >
+        <Dialog open={open} onClose={this.handleClose} fullWidth maxWidth="sm">
           <DialogTitle>Edit your details</DialogTitle>
           <DialogContent>
             <form>
@@ -98,10 +105,16 @@ export class EditDetails extends Component {
                 rows="3"
                 placeholder="A short bio about yourself"
                 className={classes.textField}
-                value={this.state.bio}
+                value={bio}
                 onChange={this.handleChange}
                 fullWidth
               />
+              <div>
+                Characters left:{" "}
+                <span style={{ color: bio.length === 80 ? "red" : "green" }}>
+                  {80 - bio.length}
+                </span>
+              </div>
               <TextField
                 variant="outlined"
                 name="website"
@@ -109,7 +122,7 @@ export class EditDetails extends Component {
                 label="Website"
                 placeholder="Your personal/proffesional website"
                 className={classes.textField}
-                value={this.state.website}
+                value={website}
                 onChange={this.handleChange}
                 fullWidth
               />
@@ -120,7 +133,7 @@ export class EditDetails extends Component {
                 label="Location"
                 placeholder="Where you live"
                 className={classes.textField}
-                value={this.state.location}
+                value={location}
                 onChange={this.handleChange}
                 fullWidth
               />
