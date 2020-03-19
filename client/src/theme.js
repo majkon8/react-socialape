@@ -15,6 +15,7 @@ export default {
   },
   typography: { useNextVariants: true },
   spreadThis: {
+    noData: { textAlign: "center", color: "rgba(0, 0, 0, 0.6)" },
     form: { textAlign: "center" },
     image: { margin: "10px auto" },
     pageTitle: { margin: "10px auto" },

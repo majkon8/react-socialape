@@ -8,7 +8,8 @@ const {
   likeScream,
   unlikeScream,
   deleteScream,
-  deleteComment
+  deleteComment,
+  searchForScreams
 } = require("./handlers/screams");
 const {
   signup,
@@ -48,6 +49,7 @@ app.get("/scream/:screamId/like", FBAuth, likeScream);
 app.get("/scream/:screamId/unlike", FBAuth, unlikeScream);
 app.delete("/scream/:screamId", FBAuth, deleteScream);
 app.delete("/scream/:screamId/comment/:commentId", FBAuth, deleteComment);
+app.get("/scream/search/:tag", FBAuth, searchForScreams);
 
 // USERS ROUTES
 

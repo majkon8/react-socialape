@@ -73,6 +73,7 @@ exports.postOneScream = (req, res) => {
     userHandle: req.user.handle,
     createdAt: new Date().toISOString(),
     userImage: req.user.imageUrl,
+    tags: req.body.tags,
     likeCount: 0,
     commentCount: 0
   };
@@ -233,6 +234,23 @@ exports.unlikeScream = (req, res) => {
           })
           .then(() => res.json(screamData));
       }
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ error: err.code });
+    });
+};
+
+// Search for screams by tag
+exports.searchForScreams = (req, res) => {
+  const tagToSearch = req.params.tag.toLowerCase();
+  const searchedScreams = [];
+  db.collection("screams")
+    .where("tags", "array-contains", tagToSearch)
+    .get()
+    .then(data => {
+      data.forEach(doc => searchedScreams.push(doc.data()));
+      res.json(searchedScreams);
     })
     .catch(err => {
       console.error(err);

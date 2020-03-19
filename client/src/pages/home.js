@@ -6,17 +6,12 @@ import ScreamSkeleton from "../components/util/ScreamSkeleton";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 // Redux
 import { connect } from "react-redux";
 import { getScreams } from "../redux/actions/dataActions";
 
-const styles = {
-  noScreams: {
-    fontSize: 30,
-    textAlign: "center",
-    color: "rgba(0, 0, 0, 0.6)"
-  }
-};
+const styles = theme => ({ ...theme.spreadThis });
 
 export class home extends Component {
   componentDidMount() {
@@ -30,7 +25,9 @@ export class home extends Component {
       screams && screams.length > 0 ? (
         screams.map(scream => <Scream key={scream.screamId} scream={scream} />)
       ) : (
-        <p className={classes.noScreams}>Follow Apes to see their screams!</p>
+        <Typography variant="h5" className={classes.noData}>
+          Follow Apes to see their screams!
+        </Typography>
       )
     ) : (
       <ScreamSkeleton />
@@ -50,7 +47,8 @@ export class home extends Component {
 
 home.propTypes = {
   getScreams: PropTypes.func.isRequired,
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({ data: state.data });

@@ -83,6 +83,14 @@ export class EditDetails extends Component {
   render() {
     const { classes } = this.props;
     const { bio, website, location, open } = this.state;
+    const charactersLeftMarkup = (
+      <div style={{ float: "right" }}>
+        Characters left:{" "}
+        <span style={{ color: bio.length === 80 ? "red" : "green" }}>
+          {80 - bio.length}
+        </span>
+      </div>
+    );
     return (
       <>
         <MyButton
@@ -109,12 +117,7 @@ export class EditDetails extends Component {
                 onChange={this.handleChange}
                 fullWidth
               />
-              <div>
-                Characters left:{" "}
-                <span style={{ color: bio.length === 80 ? "red" : "green" }}>
-                  {80 - bio.length}
-                </span>
-              </div>
+              {charactersLeftMarkup}
               <TextField
                 variant="outlined"
                 name="website"
