@@ -56,7 +56,8 @@ class PostScream extends Component {
       return;
     else if (
       event.target.name === "currentTag" &&
-      event.target.value.length > 12
+      (event.target.value.length > 12 ||
+        /[^A-Za-z0-9]+/.test(event.target.value))
     )
       return;
     else this.setState({ [event.target.name]: event.target.value });
@@ -71,7 +72,7 @@ class PostScream extends Component {
     )
       return;
     this.setState(state => ({
-      tags: [...state.tags, state.currentTag.trim()],
+      tags: [...state.tags, state.currentTag.trim().toLowerCase()],
       currentTag: ""
     }));
   };
@@ -84,7 +85,8 @@ class PostScream extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    this.props.postScream({ body: this.state.body });
+    const { body, tags } = this.state;
+    this.props.postScream({ body, tags });
   };
 
   render() {
@@ -152,7 +154,7 @@ class PostScream extends Component {
               <MyButton
                 onClick={this.addTag}
                 btnClassName={classes.addButton}
-                tip="Add tag"
+                tip="Add tag (max 6)"
               >
                 <AddIcon />
               </MyButton>

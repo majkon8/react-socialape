@@ -11,7 +11,8 @@ import {
   DELETE_COMMENT,
   SET_FOLLOWERS,
   SET_FOLLOWING,
-  SET_SEARCHED_USERS
+  SET_SEARCHED_USERS,
+  SET_SEARCHED_SCREAMS
 } from "../types";
 
 const initialState = {
@@ -21,7 +22,8 @@ const initialState = {
   profile: null,
   followersDetails: null,
   followingUsersDetails: null,
-  searchedUsers: null
+  searchedUsers: null,
+  searchedScreams: null
 };
 
 export default function(state = initialState, action) {
@@ -53,6 +55,9 @@ export default function(state = initialState, action) {
       return {
         ...state,
         screams: state.screams.filter(
+          scream => scream.screamId !== action.payload
+        ),
+        searchedScreams: state.searchedScreams.filter(
           scream => scream.screamId !== action.payload
         )
       };
@@ -95,6 +100,8 @@ export default function(state = initialState, action) {
       };
     case SET_SEARCHED_USERS:
       return { ...state, searchedUsers: action.payload, loading: false };
+    case SET_SEARCHED_SCREAMS:
+      return { ...state, searchedScreams: action.payload, loading: false };
     default:
       return state;
   }

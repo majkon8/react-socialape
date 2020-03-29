@@ -72,6 +72,11 @@ function App() {
                 path="/users/search/:name"
                 component={search}
               />
+              <UnauthRoute
+                exact
+                path="/screams/search/:tag"
+                component={search}
+              />
               <Route exact path="/users/:handle" component={user} />
               <Route
                 exact

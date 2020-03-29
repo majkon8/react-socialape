@@ -12,6 +12,7 @@ export const LOADING_UI = "LOADING_UI";
 export const STOP_LOADING_UI = "STOP_LOADING_UI";
 export const CLEAR_ERRORS = "CLEAR_ERRORS";
 export const LOADING_DATA = "LOADING_DATA";
+export const TOGGLE_SEARCH_FOR_USERS = "TOGGLE_SEARCH_FOR_USERS";
 // Data reducer types
 export const SET_SCREAMS = "SET_SCREAMS";
 export const SET_SCREAM = "SET_SCREAM";
@@ -25,3 +26,4 @@ export const DELETE_COMMENT = "DELETE_COMMENT";
 export const SET_FOLLOWERS = "SET_FOLLOWERS";
 export const SET_FOLLOWING = "SET_FOLLOWING";
 export const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
+export const SET_SEARCHED_SCREAMS = "SET_SEARCHED_SCREAMS";

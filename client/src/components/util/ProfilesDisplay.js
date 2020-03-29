@@ -45,8 +45,8 @@ const ProfilesDisplay = ({ users, loading, classes }) => {
         columnClassName="my-masonry-grid_column"
       >
         {loading
-          ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(el => (
-              <ProfileSkeleton key={el} />
+          ? Array.from({ length: 12 }).map((item, index) => (
+              <ProfileSkeleton key={index} />
             ))
           : users &&
             users.map((user, index) => {
@@ -58,6 +58,10 @@ const ProfilesDisplay = ({ users, loading, classes }) => {
   return profilesMarkup;
 };
 
-ProfilesDisplay.propTypes = { classes: PropTypes.object.isRequired };
+ProfilesDisplay.propTypes = {
+  classes: PropTypes.object.isRequired,
+  users: PropTypes.array,
+  loading: PropTypes.bool.isRequired
+};
 
 export default withStyles(styles)(ProfilesDisplay);

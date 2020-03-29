@@ -1,6 +1,6 @@
 const { db } = require("../util/admin");
 
-// Fetch all screams of followed users
+// Fetch all screams of followed users and self
 exports.getAllScreams = (req, res) => {
   const userDocument = db.doc(`/users/${req.user.handle}`);
   let followedByUser;
@@ -9,6 +9,7 @@ exports.getAllScreams = (req, res) => {
     .then(doc => {
       if (!doc.exists) return res.status(404).json({ error: "User not found" });
       followedByUser = doc.data().following;
+      followedByUser.push(req.user.handle);
       if (followedByUser.length === 0) return res.json([]);
       return db
         .collection("screams")
@@ -68,8 +69,11 @@ exports.postOneScream = (req, res) => {
     return res.status(400).json({ body: "Body must not be empty" });
   if (req.body.body.length > 280)
     return res.status(400).json({ body: "Too long scream content" });
+  if (req.body.tags.length > 6)
+    return res.status(400).json({ tag: "Too many tags" });
   const newScream = {
     body: req.body.body.trim(),
+    tags: req.body.tags,
     userHandle: req.user.handle,
     createdAt: new Date().toISOString(),
     userImage: req.user.imageUrl,
@@ -249,7 +253,12 @@ exports.searchForScreams = (req, res) => {
     .where("tags", "array-contains", tagToSearch)
     .get()
     .then(data => {
-      data.forEach(doc => searchedScreams.push(doc.data()));
+      data.forEach(doc =>
+        searchedScreams.push({
+          screamId: doc.id,
+          ...doc.data()
+        })
+      );
       res.json(searchedScreams);
     })
     .catch(err => {

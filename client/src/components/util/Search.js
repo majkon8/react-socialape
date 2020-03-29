@@ -9,6 +9,8 @@ import InputBase from "@material-ui/core/InputBase";
 import Divider from "@material-ui/core/Divider";
 import SearchIcon from "@material-ui/icons/Search";
 import IconButton from "@material-ui/core/IconButton";
+// Redux
+import { connect } from "react-redux";
 
 const styles = theme => ({
   ...theme.spreadThis,
@@ -36,11 +38,18 @@ export class Search extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, isToggledSearchForUsers } = this.props;
     const { inputValue } = this.state;
     const searchButton =
       inputValue.length > 2 ? (
-        <Link ref={this.searchRef} to={`/users/search/${inputValue}`}>
+        <Link
+          ref={this.searchRef}
+          to={
+            isToggledSearchForUsers
+              ? `/users/search/${inputValue}`
+              : `/screams/search/${inputValue}`
+          }
+        >
           <MyButton btnClassName={classes.iconButton} tip="Search">
             <SearchIcon style={{ color: "#d84315" }} />
           </MyButton>
@@ -70,6 +79,13 @@ export class Search extends Component {
   }
 }
 
-Search.propTypes = { classes: PropTypes.object.isRequired };
+Search.propTypes = {
+  classes: PropTypes.object.isRequired,
+  isToggledSearchForUsers: PropTypes.bool.isRequired
+};
 
-export default withStyles(styles)(Search);
+const mapStateToProps = state => ({
+  isToggledSearchForUsers: state.UI.isToggledSearchForUsers
+});
+
+export default connect(mapStateToProps)(withStyles(styles)(Search));

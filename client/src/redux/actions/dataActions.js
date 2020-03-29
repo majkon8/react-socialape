@@ -15,7 +15,8 @@ import {
   DELETE_COMMENT,
   SET_FOLLOWERS,
   SET_FOLLOWING,
-  SET_SEARCHED_USERS
+  SET_SEARCHED_USERS,
+  SET_SEARCHED_SCREAMS
 } from "../types";
 import axios from "axios";
 
@@ -139,12 +140,18 @@ export const searchForUsers = name => dispatch => {
   dispatch({ type: LOADING_DATA });
   axios
     .get(`/user/search/${name}`)
-    .then(res => dispatch(setSearchedUsers(res.data)))
+    .then(res => dispatch({ type: SET_SEARCHED_USERS, payload: res.data }))
     .catch(err => console.log(err));
 };
 
-export const setSearchedUsers = payload => dispatch =>
-  dispatch({ type: SET_SEARCHED_USERS, payload: payload });
+// Search for screams
+export const searchForScreams = tag => dispatch => {
+  dispatch({ type: LOADING_DATA });
+  axios
+    .get(`/scream/search/${tag}`)
+    .then(res => dispatch({ type: SET_SEARCHED_SCREAMS, payload: res.data }))
+    .catch(err => console.log(err));
+};
 
 // Set followers details
 export const setFollowers = payload => dispatch =>

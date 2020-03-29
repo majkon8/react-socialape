@@ -3,6 +3,7 @@ import Scream from "../components/scream/Scream";
 import Profile from "../components/profile/Profile";
 import PropTypes from "prop-types";
 import ScreamSkeleton from "../components/util/ScreamSkeleton";
+import ScreamsDisplay from "../components/util/ScreamsDisplay";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
@@ -21,24 +22,13 @@ export class home extends Component {
   render() {
     const { classes } = this.props;
     const { screams, loading } = this.props.data;
-    let recentScreamsMarkup = !loading ? (
-      screams && screams.length > 0 ? (
-        screams.map(scream => <Scream key={scream.screamId} scream={scream} />)
-      ) : (
-        <Typography variant="h5" className={classes.noData}>
-          Follow Apes to see their screams!
-        </Typography>
-      )
-    ) : (
-      <ScreamSkeleton />
-    );
     return (
       <Grid container spacing={2}>
         <Grid item sm={4} xs={12}>
           <Profile />
         </Grid>
         <Grid item sm={8} xs={12}>
-          {recentScreamsMarkup}
+          <ScreamsDisplay loading={loading} screams={screams} />
         </Grid>
       </Grid>
     );

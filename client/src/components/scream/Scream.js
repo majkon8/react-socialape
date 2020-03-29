@@ -19,8 +19,8 @@ import ChatIcon from "@material-ui/icons/Chat";
 import { connect } from "react-redux";
 
 const styles = {
-  card: { display: "flex", position: "relative", marginBottom: 20 },
-  image: { minWidth: 200 },
+  card: { display: "flex", position: "relative", marginBottom: 20, alignItems: "center" },
+  image: { minWidth: 200, height: 200 },
   content: { padding: 25, objectFit: "cover" }
 };
 
@@ -31,6 +31,7 @@ export class Scream extends Component {
       classes,
       scream: {
         body,
+        tags,
         createdAt,
         userImage,
         userHandle,
@@ -68,6 +69,19 @@ export class Scream extends Component {
             {dayjs(createdAt).fromNow()}
           </Typography>
           <Typography variant="body1">{body}</Typography>
+          <div style={{ marginTop: 5 }}>
+            {tags.map(tag => (
+              <Typography
+                variant="body2"
+                component={Link}
+                to={`/screams/search/${tag}`}
+                key={tag}
+                style={{ display: "inline", color: "#00bcd4" }}
+              >
+                {`#${tag} `}
+              </Typography>
+            ))}
+          </div>
           <LikeButton screamId={screamId} />
           <span style={{ marginRight: 5 }}>
             {likeCount} {likeCount === 1 ? "Like" : "Likes"}

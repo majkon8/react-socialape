@@ -26,6 +26,7 @@ export class Tag extends Component {
           className={classes.tagButton}
           onClick={() => removeTag(tagName)}
           variant="contained"
+          style={{ textTransform: "none" }}
         >
           {tagName}
         </Button>

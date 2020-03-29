@@ -41,8 +41,7 @@ export default {
       "& .profile-handle": { textAlign: "center" },
       "& .profile-details": {
         textAlign: "center",
-        "& span, svg": { verticalAlign: "middle" },
-        "& a": { color: "#00bcd4" }
+        "& span, svg": { verticalAlign: "middle" }
       },
       "& hr": { border: "none", margin: "0 0 10px 0" },
       "& svg.button": { "& hover": { cursor: "pointer" } }
