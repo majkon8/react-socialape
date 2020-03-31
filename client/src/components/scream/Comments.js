@@ -35,7 +35,14 @@ export class Comments extends Component {
     return (
       <Grid container>
         {comments.map((comment, index) => {
-          const { commentId, body, createdAt, userImage, userHandle } = comment;
+          const {
+            commentId,
+            body,
+            createdAt,
+            userImage,
+            userHandle,
+            userNickname
+          } = comment;
           const deleteButton =
             authenticated && userHandle === handle ? (
               <DeleteComment screamId={scream.screamId} commentId={commentId} />
@@ -59,7 +66,7 @@ export class Comments extends Component {
                         to={`/users/${userHandle}`}
                         color="primary"
                       >
-                        {userHandle}
+                        {userNickname}
                       </Typography>
                       {deleteButton}
                       <Typography variant="body2" color="textSecondary">

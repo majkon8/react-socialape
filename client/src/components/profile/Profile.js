@@ -36,7 +36,8 @@ export class Profile extends Component {
           website,
           location,
           followers,
-          following
+          following,
+          nickname
         },
         loading
       }
@@ -56,7 +57,7 @@ export class Profile extends Component {
               color="primary"
               variant="h5"
             >
-              @{handle}
+              {nickname}
             </MuiLink>
           </div>
           <hr />

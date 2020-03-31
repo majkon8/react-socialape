@@ -40,7 +40,8 @@ const StaticProfile = ({
     website,
     location,
     followers,
-    following
+    following,
+    nickname
   },
   user: { credentials }
 }) => {
@@ -80,7 +81,7 @@ const StaticProfile = ({
             color="primary"
             variant="h5"
           >
-            @{handle}
+            {nickname}
           </MuiLink>
         </div>
         <hr />

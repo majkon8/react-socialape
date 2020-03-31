@@ -37,7 +37,8 @@ export class Scream extends Component {
         userHandle,
         screamId,
         likeCount,
-        commentCount
+        commentCount,
+        userNickname
       },
       user: {
         authenticated,
@@ -62,7 +63,7 @@ export class Scream extends Component {
             to={`/users/${userHandle}`}
             color="primary"
           >
-            {userHandle}
+            {userNickname}
           </Typography>
           {deleteButton}
           <Typography variant="body2" color="textSecondary">

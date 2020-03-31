@@ -43,7 +43,8 @@ export class signup extends Component {
       email: this.state.email,
       password: this.state.password,
       confirmPassword: this.state.confirmPassword,
-      handle: this.state.handle
+      handle: this.state.handle,
+      nickname: this.state.handle
     };
     this.props.signupUser(newUserData);
   };
@@ -103,7 +104,7 @@ export class signup extends Component {
               id="handle"
               name="handle"
               type="text"
-              label="Handle"
+              label="Username"
               className={classes.textField}
               helperText={errors.handle}
               error={errors.handle ? true : false}

@@ -46,7 +46,7 @@ export class ScreamDialog extends Component {
     let oldPath = window.location.pathname;
     const { userHandle, screamId } = this.props;
     const newPath = `/users/${userHandle}/scream/${screamId}`;
-    if (oldPath === newPath) oldPath = `/users/${userHandle}`
+    if (oldPath === newPath) oldPath = `/users/${userHandle}`;
     window.history.pushState(null, null, newPath);
     this.setState({ open: true, oldPath, newPath });
     this.props.getScream(this.props.screamId);
@@ -69,7 +69,8 @@ export class ScreamDialog extends Component {
         commentCount,
         userImage,
         userHandle,
-        comments
+        comments,
+        userNickname
       },
       UI: { loading }
     } = this.props;
@@ -90,7 +91,7 @@ export class ScreamDialog extends Component {
             variant="h5"
             to={`/users/${userHandle}`}
           >
-            @{userHandle}
+            {userNickname}
           </Typography>
           <hr className={classes.invisibleSeparator} />
           <Typography variant="body2" color="textSecondary">

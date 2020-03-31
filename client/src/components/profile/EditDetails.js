@@ -22,7 +22,13 @@ const styles = theme => ({
 });
 
 export class EditDetails extends Component {
-  state = { bio: "", website: "", location: "", open: false };
+  state = {
+    nickname: "",
+    bio: "",
+    website: "",
+    location: "",
+    open: false
+  };
 
   componentDidMount() {
     this.mapUserDetailsToState(this.props.credentials);
@@ -45,6 +51,8 @@ export class EditDetails extends Component {
       event.target.value.length > 30
     )
       return;
+    if (event.target.name === "nickname" && event.target.value.length > 20)
+      return;
     this.setState({ [event.target.name]: event.target.value });
   };
 
@@ -62,9 +70,10 @@ export class EditDetails extends Component {
 
   mapUserDetailsToState = credentials => {
     this.setState({
-      bio: credentials.bio ? credentials.bio : "",
-      website: credentials.website ? credentials.website : "",
-      location: credentials.location ? credentials.location : ""
+      bio: credentials.bio && credentials.bio,
+      website: credentials.website && credentials.website,
+      location: credentials.location && credentials.location,
+      nickname: credentials.nickname && credentials.nickname
     });
   };
 
@@ -74,7 +83,8 @@ export class EditDetails extends Component {
     const userDetails = {
       bio: this.state.bio,
       website: this.state.website,
-      location: this.state.location
+      location: this.state.location,
+      nickname: this.state.nickname
     };
     this.props.editUserDetails(userDetails);
     this.handleClose();
@@ -82,7 +92,7 @@ export class EditDetails extends Component {
 
   render() {
     const { classes } = this.props;
-    const { bio, website, location, open } = this.state;
+    const { nickname, bio, website, location, open } = this.state;
     const charactersLeftMarkup = (
       <div style={{ float: "right" }}>
         Characters left:{" "}
@@ -104,6 +114,17 @@ export class EditDetails extends Component {
           <DialogTitle>Edit your details</DialogTitle>
           <DialogContent>
             <form>
+              <TextField
+                variant="outlined"
+                name="nickname"
+                type="text"
+                label="Nickname"
+                placeholder="Nickname"
+                className={classes.textField}
+                value={nickname}
+                onChange={this.handleChange}
+                fullWidth
+              />
               <TextField
                 variant="outlined"
                 name="bio"
