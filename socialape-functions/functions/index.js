@@ -31,6 +31,7 @@ const {
   handleDeleteNotificationOnCommentDelete,
   handleOnUserImageChange,
   handleOnScreamDelete,
+  handleOnNicknameChange,
   handleCreateNotificationOnFollow,
   handleDeleteNotificationOnUnfollow
 } = require("./dbtriggers");
@@ -114,6 +115,11 @@ exports.onUserImageChange = functions
   .region("europe-west1")
   .firestore.document("/users/{userId}")
   .onUpdate(handleOnUserImageChange);
+
+exports.onNicknameChange = functions
+  .region("europe-west1")
+  .firestore.document("/users/{userId}")
+  .onUpdate(handleOnNicknameChange);
 
 // Handle deleting scream
 exports.onScreamDelete = functions

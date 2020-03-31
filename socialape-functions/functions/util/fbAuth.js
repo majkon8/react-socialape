@@ -27,6 +27,7 @@ module.exports = (req, res, next) => {
       req.user.following = data.docs[0].data().following;
       req.user.handle = data.docs[0].data().handle;
       req.user.imageUrl = data.docs[0].data().imageUrl;
+      req.user.nickname = data.docs[0].data().nickname;
       return next();
     })
     .catch(err => {

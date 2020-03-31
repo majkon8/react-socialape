@@ -49,5 +49,7 @@ exports.reduceUserDetails = data => {
   }
   if (!isEmpty(data.location.trim()))
     userDetails.location = data.location.trim();
+  if (!isEmpty(data.nickname.trim()))
+    userDetails.nickname = data.nickname.trim();
   return userDetails;
 };

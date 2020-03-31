@@ -340,6 +340,10 @@ exports.searchForUser = (req, res) => {
           doc
             .data()
             .handle.toLowerCase()
+            .includes(nameToSearch) ||
+          doc
+            .data()
+            .nickname.toLowerCase()
             .includes(nameToSearch)
         )
           searchedUsers.push(doc.data());

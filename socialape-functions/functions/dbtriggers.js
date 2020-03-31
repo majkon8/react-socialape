@@ -93,6 +93,7 @@ exports.handleCreateNotificationOnFollow = change => {
   return null;
 };
 
+// Delete notification on unfollow
 exports.handleDeleteNotificationOnUnfollow = change => {
   const dataBefore = change.before.data();
   const dataAfter = change.after.data();
@@ -125,6 +126,18 @@ exports.handleOnUserImageChange = change => {
           const scream = db.doc(`/screams/${doc.id}`);
           batch.update(scream, { userImage: change.after.data().imageUrl });
         });
+        return db
+          .collection("comments")
+          .where("userHandle", "==", change.before.data().handle)
+          .get();
+      })
+      .then(data => {
+        data.forEach(doc => {
+          const comment = db.doc(`/comments/${doc.id}`);
+          batch.update(comment, {
+            userImage: change.after.data().imageUrl
+          });
+        });
         return batch.commit();
       })
       .catch(err => {
@@ -134,7 +147,41 @@ exports.handleOnUserImageChange = change => {
   } else return true;
 };
 
-// Handle deleting scream handler
+// Handle nickname change
+exports.handleOnNicknameChange = change => {
+  if (change.before.data().nickname !== change.after.data().nickname) {
+    const batch = db.batch();
+    return db
+      .collection("screams")
+      .where("userHandle", "==", change.before.data().handle)
+      .get()
+      .then(data => {
+        data.forEach(doc => {
+          const scream = db.doc(`/screams/${doc.id}`);
+          batch.update(scream, { userNickname: change.after.data().nickname });
+        });
+        return db
+          .collection("comments")
+          .where("userHandle", "==", change.before.data().handle)
+          .get();
+      })
+      .then(data => {
+        data.forEach(doc => {
+          const comment = db.doc(`/comments/${doc.id}`);
+          batch.update(comment, {
+            userNickname: change.after.data().nickname
+          });
+        });
+        return batch.commit();
+      })
+      .catch(err => {
+        console.error(err);
+        return;
+      });
+  } else return true;
+};
+
+// Handle deleting scream
 exports.handleOnScreamDelete = (snapshot, context) => {
   const screamId = context.params.screamId;
   const batch = db.batch();
