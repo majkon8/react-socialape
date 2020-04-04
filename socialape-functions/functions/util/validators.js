@@ -1,9 +1,9 @@
-const isEmpty = string => {
+const isEmpty = (string) => {
   if (string.trim() === "") return true;
   return false;
 };
 
-const isEmail = email => {
+const isEmail = (email) => {
   const emailRegEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (email.match(emailRegEx)) return true;
   return false;
@@ -11,7 +11,7 @@ const isEmail = email => {
 
 const handleRegEx = /^[a-zA-Z0-9_.-]*$/;
 
-exports.validateSignupData = data => {
+exports.validateSignupData = (data) => {
   let errors = {};
   if (isEmpty(data.email.trim())) errors.email = "Must not be empty";
   else if (!isEmail(data.email)) errors.email = "Must be a valid email address";
@@ -25,21 +25,31 @@ exports.validateSignupData = data => {
     errors.handle = "Only letters, numbers and - . _ allowed";
   return {
     errors,
-    valid: Object.keys(errors).length === 0 ? true : false
+    valid: Object.keys(errors).length === 0 ? true : false,
   };
 };
 
-exports.validateLoginData = data => {
+exports.validateLoginData = (data) => {
   let errors = {};
   if (isEmpty(data.email)) errors.email = "Must not be empty";
   if (isEmpty(data.password)) errors.password = "Must not be empty";
   return {
     errors,
-    valid: Object.keys(errors).length === 0 ? true : false
+    valid: Object.keys(errors).length === 0 ? true : false,
   };
 };
 
-exports.reduceUserDetails = data => {
+exports.validatePasswordChangeData = (data) => {
+  let errors = {};
+  if (isEmpty(data.newPassword)) errors.newPassword = "Must not be empty";
+  else if (data.newPassword.length < 8)
+    errors.newPassword = "Minimum 8 characters";
+  else if (data.newPassword !== data.confirmNewPassword)
+    errors.confirmNewPassword = "Passwords must match";
+  return { errors, valid: Object.keys(errors).length === 0 ? true : false };
+};
+
+exports.reduceUserDetails = (data) => {
   let userDetails = {};
   if (!isEmpty(data.bio.trim())) userDetails.bio = data.bio.trim();
   if (!isEmpty(data.website.trim())) {

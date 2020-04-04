@@ -9,7 +9,7 @@ const {
   unlikeScream,
   deleteScream,
   deleteComment,
-  searchForScreams
+  searchForScreams,
 } = require("./handlers/screams");
 const {
   signup,
@@ -22,7 +22,8 @@ const {
   follow,
   unfollow,
   getFollowUsersDetails,
-  searchForUser
+  searchForUser,
+  changePassword,
 } = require("./handlers/users");
 const {
   handleCreateNotificationOnLike,
@@ -33,7 +34,7 @@ const {
   handleOnScreamDelete,
   handleOnNicknameChange,
   handleCreateNotificationOnFollow,
-  handleDeleteNotificationOnUnfollow
+  handleDeleteNotificationOnUnfollow,
 } = require("./dbtriggers");
 const FBAuth = require("./util/fbAuth");
 const cors = require("cors");
@@ -70,6 +71,7 @@ app.get("/user/:handle/following", FBAuth, (req, res) =>
   getFollowUsersDetails(req, res, "following")
 );
 app.get("/user/search/:name", FBAuth, searchForUser);
+app.post("/user/password", changePassword);
 
 exports.api = functions.region("europe-west1").https.onRequest(app);
 

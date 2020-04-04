@@ -4,14 +4,15 @@ const config = require("../util/config");
 const {
   validateSignupData,
   validateLoginData,
-  reduceUserDetails
+  reduceUserDetails,
+  validatePasswordChangeData,
 } = require("../util/validators");
 firebase.initializeApp(config);
 
 // User sign up
 exports.signup = (req, res) => {
   const newUser = {
-    ...req.body
+    ...req.body,
   };
   const { valid, errors } = validateSignupData(newUser);
   if (!valid) return res.status(400).json(errors);
@@ -19,7 +20,7 @@ exports.signup = (req, res) => {
   let token, userId;
   db.doc(`/users/${newUser.handle}`)
     .get()
-    .then(doc => {
+    .then((doc) => {
       if (doc.exists)
         return res.status(400).json({ handle: "This handle is already taken" });
       else {
@@ -28,17 +29,17 @@ exports.signup = (req, res) => {
           .createUserWithEmailAndPassword(newUser.email, newUser.password);
       }
     })
-    .then(data => {
+    .then((data) => {
       userId = data.user.uid;
       return admin.auth().createCustomToken(userId);
     })
-    .then(customToken => {
+    .then((customToken) => {
       return firebase.auth().signInWithCustomToken(customToken);
     })
-    .then(data => {
+    .then((data) => {
       return data.user.getIdToken();
     })
-    .then(idToken => {
+    .then((idToken) => {
       token = idToken;
       const userCredentials = {
         ...newUser,
@@ -46,12 +47,12 @@ exports.signup = (req, res) => {
         userId,
         imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`,
         followers: [],
-        following: []
+        following: [],
       };
       return db.doc(`/users/${newUser.handle}`).set(userCredentials);
     })
     .then(() => res.status(201).json({ token }))
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       if (err.code === "auth/email-already-in-use")
         return res.status(400).json({ email: "Email is already in use" });
@@ -64,16 +65,16 @@ exports.signup = (req, res) => {
 // User log in
 exports.login = (req, res) => {
   const user = {
-    ...req.body
+    ...req.body,
   };
   const { valid, errors } = validateLoginData(user);
   if (!valid) return res.status(400).json(errors);
   firebase
     .auth()
     .signInWithEmailAndPassword(user.email, user.password)
-    .then(data => data.user.getIdToken())
-    .then(token => res.json({ token }))
-    .catch(err => {
+    .then((data) => data.user.getIdToken())
+    .then((token) => res.json({ token }))
+    .catch((err) => {
       console.error(err);
       return res
         .status(403)
@@ -87,7 +88,7 @@ exports.addUserDetails = (req, res) => {
   db.doc(`/users/${req.user.handle}`)
     .update(userDetails)
     .then(() => res.json({ message: "Details added successfully" }))
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       return res.status(500).json({ error: err.code });
     });
@@ -98,7 +99,7 @@ exports.getUserDetails = (req, res) => {
   let userData = {};
   db.doc(`/users/${req.params.handle}`)
     .get()
-    .then(doc => {
+    .then((doc) => {
       if (doc.exists) {
         userData.user = doc.data();
         return db
@@ -109,17 +110,17 @@ exports.getUserDetails = (req, res) => {
       }
       return res.json(404).json({ error: "User not found" });
     })
-    .then(data => {
+    .then((data) => {
       userData.screams = [];
-      data.forEach(doc =>
+      data.forEach((doc) =>
         userData.screams.push({
           ...doc.data(),
-          screamId: doc.id
+          screamId: doc.id,
         })
       );
       return res.json(userData);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       return res.status(500).json({ error: err.code });
     });
@@ -130,7 +131,7 @@ exports.getAuthenticatedUser = (req, res) => {
   let userData = {};
   db.doc(`/users/${req.user.handle}`)
     .get()
-    .then(doc => {
+    .then((doc) => {
       if (doc.exists) {
         userData.credentials = doc.data();
         return db
@@ -139,9 +140,9 @@ exports.getAuthenticatedUser = (req, res) => {
           .get();
       }
     })
-    .then(data => {
+    .then((data) => {
       userData.likes = [];
-      data.forEach(doc => userData.likes.push(doc.data()));
+      data.forEach((doc) => userData.likes.push(doc.data()));
       return db
         .collection("notifications")
         .where("recipient", "==", req.user.handle)
@@ -149,17 +150,17 @@ exports.getAuthenticatedUser = (req, res) => {
         .limit(100)
         .get();
     })
-    .then(data => {
+    .then((data) => {
       userData.notifications = [];
-      data.forEach(doc =>
+      data.forEach((doc) =>
         userData.notifications.push({
           ...doc.data(),
-          notificationId: doc.id
+          notificationId: doc.id,
         })
       );
       return res.json(userData);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       return res.status(500).json({ error: err.code });
     });
@@ -193,16 +194,16 @@ exports.uploadImage = (req, res) => {
         resumable: false,
         metadata: {
           metadata: {
-            contentType: imageToBeUploaded.mimetype
-          }
-        }
+            contentType: imageToBeUploaded.mimetype,
+          },
+        },
       })
       .then(() => {
         const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
         return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
       })
       .then(() => res.json({ message: "Image uploaded successfully" }))
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         return res.status(500).json({ error: err.code });
       });
@@ -213,14 +214,14 @@ exports.uploadImage = (req, res) => {
 // Mark notifications read
 exports.markNotificationsRead = (req, res) => {
   const batch = db.batch();
-  req.body.forEach(notificationId => {
+  req.body.forEach((notificationId) => {
     const notification = db.doc(`/notifications/${notificationId}`);
     batch.update(notification, { read: true });
   });
   batch
     .commit()
     .then(() => res.json({ message: "Notifications marked read" }))
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       return res.status(500).json({ error: err.code });
     });
@@ -237,7 +238,7 @@ exports.follow = (req, res) => {
     return res.status(400).json({ error: "Cannot follow the user" });
   userToFollowDoc
     .get()
-    .then(doc => {
+    .then((doc) => {
       if (!doc.exists) return res.status(404).json({ error: "User not found" });
       else {
         const userToFollowData = doc.data();
@@ -245,18 +246,18 @@ exports.follow = (req, res) => {
           return res.json(400).json({ error: "User already followed" });
         userToFollowData.followers.push(userHandle);
         return userToFollowDoc.update({
-          followers: [...userToFollowData.followers]
+          followers: [...userToFollowData.followers],
         });
       }
     })
     .then(() => userDocument.get())
-    .then(doc => {
+    .then((doc) => {
       userData = doc.data();
       userData.following.push(userToFollow);
       return userDocument.update({ following: [...userData.following] });
     })
     .then(() => res.json(userData))
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       res.status(500).json({ error: err.code });
     });
@@ -271,30 +272,30 @@ exports.unfollow = (req, res) => {
   let userData;
   userToUnfollowDoc
     .get()
-    .then(doc => {
+    .then((doc) => {
       if (!doc.exists) return res.status(404).json({ error: "User not found" });
       else {
         const userToUnfollowData = doc.data();
         if (!userToUnfollowData.followers.includes(userHandle))
           return res.status(400).json({ error: "User not followed" });
         userToUnfollowData.followers = userToUnfollowData.followers.filter(
-          handle => handle !== userHandle
+          (handle) => handle !== userHandle
         );
         return userToUnfollowDoc.update({
-          followers: [...userToUnfollowData.followers]
+          followers: [...userToUnfollowData.followers],
         });
       }
     })
     .then(() => userDocument.get())
-    .then(doc => {
+    .then((doc) => {
       userData = doc.data();
       userData.following = userData.following.filter(
-        handle => handle !== userToUnfollow
+        (handle) => handle !== userToUnfollow
       );
       return userDocument.update({ following: [...userData.following] });
     })
     .then(() => res.json(userData))
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       res.status(500).json({ error: err.code });
     });
@@ -308,7 +309,7 @@ exports.getFollowUsersDetails = (req, res, type) => {
   let followUsersDetails = [];
   userDocument
     .get()
-    .then(doc => {
+    .then((doc) => {
       if (!doc.exists) return res.status(404).json({ error: "User not found" });
       followUsersHandles =
         type === "followers" ? doc.data().followers : doc.data().following;
@@ -318,11 +319,11 @@ exports.getFollowUsersDetails = (req, res, type) => {
         .where("handle", "in", followUsersHandles)
         .get();
     })
-    .then(data => {
-      data.forEach(doc => followUsersDetails.push(doc.data()));
+    .then((data) => {
+      data.forEach((doc) => followUsersDetails.push(doc.data()));
       res.json(followUsersDetails);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       res.status(500).json({ error: err.code });
     });
@@ -334,24 +335,43 @@ exports.searchForUser = (req, res) => {
   const searchedUsers = [];
   db.collection("users")
     .get()
-    .then(data => {
-      data.forEach(doc => {
+    .then((data) => {
+      data.forEach((doc) => {
         if (
-          doc
-            .data()
-            .handle.toLowerCase()
-            .includes(nameToSearch) ||
-          doc
-            .data()
-            .nickname.toLowerCase()
-            .includes(nameToSearch)
+          doc.data().handle.toLowerCase().includes(nameToSearch) ||
+          doc.data().nickname.toLowerCase().includes(nameToSearch)
         )
           searchedUsers.push(doc.data());
       });
       res.json(searchedUsers);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
+      res.status(500).json({ error: err.code });
+    });
+};
+
+// Change user's password
+exports.changePassword = (req, res) => {
+  const user = firebase.auth().currentUser;
+  const { oldPassword, newPassword } = req.body;
+  const credentials = firebase.auth.EmailAuthProvider.credential(
+    user.email,
+    oldPassword
+  );
+  user
+    .reauthenticateWithCredential(credentials)
+    .then(() => {
+      const { valid, errors } = validatePasswordChangeData(req.body);
+      if (!valid) return res.status(400).json(errors);
+      user
+        .updatePassword(newPassword)
+        .then(() => res.status(200).json({ success: "success" }));
+    })
+    .catch((err) => {
+      console.error(err);
+      const errors = { password: "Wrong password" };
+      if (err.code === "auth/wrong-password") res.status(403).json(errors);
       res.status(500).json({ error: err.code });
     });
 };

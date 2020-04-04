@@ -8,6 +8,8 @@ export const FOLLOW = "FOLLOW";
 export const UNFOLLOW = "UNFOLLOW";
 // UI reducer types
 export const SET_ERRORS = "SET_ERRORS";
+export const SET_SUCCESSES = "SET_SUCCESSES";
+export const CLEAR_SUCCESSES = "CLEAR_SUCCESSES";
 export const LOADING_UI = "LOADING_UI";
 export const STOP_LOADING_UI = "STOP_LOADING_UI";
 export const CLEAR_ERRORS = "CLEAR_ERRORS";

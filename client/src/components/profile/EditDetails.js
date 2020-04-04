@@ -4,7 +4,12 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import MyButton from "../util/MyButton";
 // Redux
 import { connect } from "react-redux";
-import { editUserDetails, uploadImage } from "../../redux/actions/userActions";
+import {
+  editUserDetails,
+  uploadImage,
+  changePassword,
+} from "../../redux/actions/userActions";
+import { clearErrors, clearSuccesses } from "../../redux/actions/uiActions";
 // MUI
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -16,9 +21,9 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import EditIcon from "@material-ui/icons/Edit";
 import ImageIcon from "@material-ui/icons/Image";
 
-const styles = theme => ({
+const styles = (theme) => ({
   ...theme.spreadThis,
-  button: { position: "absolute", zIndex: 1 }
+  button: { position: "absolute", zIndex: 1 },
 });
 
 export class EditDetails extends Component {
@@ -27,7 +32,11 @@ export class EditDetails extends Component {
     bio: "",
     website: "",
     location: "",
-    open: false
+    open: false,
+    passwordFormIsOpen: false,
+    oldPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
   };
 
   componentDidMount() {
@@ -39,7 +48,7 @@ export class EditDetails extends Component {
     this.mapUserDetailsToState(this.props.credentials);
   };
 
-  handleChange = event => {
+  handleChange = (event) => {
     if (event.target.name === "bio" && event.target.value.length > 80) return;
     if (
       this.state[event.target.name] === "" &&
@@ -56,7 +65,7 @@ export class EditDetails extends Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  handleImageChange = event => {
+  handleImageChange = (event) => {
     const image = event.target.files[0];
     const formData = new FormData();
     formData.append("image", image, image.name);
@@ -68,31 +77,62 @@ export class EditDetails extends Component {
     fileInput.click();
   };
 
-  mapUserDetailsToState = credentials => {
+  mapUserDetailsToState = (credentials) => {
     this.setState({
       bio: credentials.bio && credentials.bio,
       website: credentials.website && credentials.website,
       location: credentials.location && credentials.location,
-      nickname: credentials.nickname && credentials.nickname
+      nickname: credentials.nickname && credentials.nickname,
     });
   };
 
-  handleClose = () => this.setState({ open: false });
+  handleClose = () => {
+    this.setState({
+      open: false,
+      oldPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+      passwordFormIsOpen: false,
+    });
+    this.props.clearErrors();
+    this.props.clearSuccesses();
+  };
 
   handleSubmit = () => {
     const userDetails = {
       bio: this.state.bio,
       website: this.state.website,
       location: this.state.location,
-      nickname: this.state.nickname
+      nickname: this.state.nickname,
     };
     this.props.editUserDetails(userDetails);
     this.handleClose();
   };
 
+  togglePasswordForm = () =>
+    this.setState((state) => ({
+      passwordFormIsOpen: !state.passwordFormIsOpen,
+    }));
+
+  handlePasswordChange = () => {
+    const { oldPassword, newPassword, confirmNewPassword } = this.state;
+    const credentials = { oldPassword, newPassword, confirmNewPassword };
+    this.props.changePassword(credentials);
+  };
+
   render() {
-    const { classes } = this.props;
-    const { nickname, bio, website, location, open } = this.state;
+    const { classes, errors, successes } = this.props;
+    const {
+      nickname,
+      bio,
+      website,
+      location,
+      open,
+      passwordFormIsOpen,
+      oldPassword,
+      newPassword,
+      confirmNewPassword,
+    } = this.state;
     const charactersLeftMarkup = (
       <div style={{ float: "right" }}>
         Characters left:{" "}
@@ -174,6 +214,57 @@ export class EditDetails extends Component {
                 <ImageIcon color="primary" />
               </MyButton>
             </form>
+            <a style={{ cursor: "pointer" }} onClick={this.togglePasswordForm}>
+              Change password
+            </a>
+            {passwordFormIsOpen && (
+              <form>
+                <TextField
+                  variant="outlined"
+                  name="oldPassword"
+                  type="password"
+                  label="Old password"
+                  error={errors && errors.password ? true : false}
+                  helperText={errors && errors.password}
+                  className={classes.textField}
+                  value={oldPassword}
+                  onChange={this.handleChange}
+                  fullWidth
+                />
+                <TextField
+                  variant="outlined"
+                  name="newPassword"
+                  type="password"
+                  label="New password"
+                  error={errors && errors.newPassword ? true : false}
+                  helperText={errors && errors.newPassword}
+                  className={classes.textField}
+                  value={newPassword}
+                  onChange={this.handleChange}
+                  fullWidth
+                />
+                <TextField
+                  variant="outlined"
+                  name="confirmNewPassword"
+                  type="password"
+                  label="Repeat new password"
+                  error={errors && errors.confirmNewPassword ? true : false}
+                  helperText={errors && errors.confirmNewPassword}
+                  className={classes.textField}
+                  value={confirmNewPassword}
+                  onChange={this.handleChange}
+                  fullWidth
+                />
+                {successes && (
+                  <div style={{ color: "green", marginBottom: 10 }}>
+                    {successes.success}
+                  </div>
+                )}
+                <Button variant="contained" onClick={this.handlePasswordChange}>
+                  Save
+                </Button>
+              </form>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">
@@ -192,12 +283,27 @@ export class EditDetails extends Component {
 EditDetails.propTypes = {
   editUserDetails: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
-  uploadImage: PropTypes.func.isRequired
+  uploadImage: PropTypes.func.isRequired,
+  changePassword: PropTypes.func.isRequired,
+  errors: PropTypes.object,
+  successes: PropTypes.object,
+  clearErrors: PropTypes.func.isRequired,
+  clearSuccesses: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({ credentials: state.user.credentials });
+const mapStateToProps = (state) => ({
+  credentials: state.user.credentials,
+  errors: state.UI.errors,
+  successes: state.UI.successes,
+});
 
-const mapActionsToProps = { editUserDetails, uploadImage };
+const mapActionsToProps = {
+  editUserDetails,
+  uploadImage,
+  changePassword,
+  clearErrors,
+  clearSuccesses,
+};
 
 export default connect(
   mapStateToProps,
