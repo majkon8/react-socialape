@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router,
   Route,
   Switch,
-  Redirect
+  Redirect,
 } from "react-router-dom";
 import "./App.css";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
@@ -27,6 +27,7 @@ import signup from "./pages/signup";
 import user from "./pages/user";
 import follows from "./pages/follows";
 import search from "./pages/search";
+import forgotPassword from "./pages/forgotPassword";
 
 const theme = createMuiTheme(themeFile);
 
@@ -57,6 +58,7 @@ function App() {
               <UnauthRoute exact path="/" component={home} />
               <AuthRoute exact path="/login" component={login} />
               <AuthRoute exact path="/signup" component={signup} />
+              <AuthRoute exact path="/forgot" component={forgotPassword} />
               <UnauthRoute
                 exact
                 path="/users/:handle/followers"

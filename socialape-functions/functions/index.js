@@ -24,6 +24,7 @@ const {
   getFollowUsersDetails,
   searchForUser,
   changePassword,
+  sendPasswordResetEmail,
 } = require("./handlers/users");
 const {
   handleCreateNotificationOnLike,
@@ -72,6 +73,7 @@ app.get("/user/:handle/following", FBAuth, (req, res) =>
 );
 app.get("/user/search/:name", FBAuth, searchForUser);
 app.post("/user/password", changePassword);
+app.post("/user/forgot", sendPasswordResetEmail);
 
 exports.api = functions.region("europe-west1").https.onRequest(app);
 

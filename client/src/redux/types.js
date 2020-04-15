@@ -6,6 +6,7 @@ export const LOADING_USER = "LOADING_USER";
 export const MARK_NOTIFICATIONS_READ = "MARK_NOTIFICATIONS_READ";
 export const FOLLOW = "FOLLOW";
 export const UNFOLLOW = "UNFOLLOW";
+export const FORGOT_PASSWORD = "FORGOT_PASSWORD";
 // UI reducer types
 export const SET_ERRORS = "SET_ERRORS";
 export const SET_SUCCESSES = "SET_SUCCESSES";

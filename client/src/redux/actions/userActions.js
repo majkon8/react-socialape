@@ -10,6 +10,7 @@ import {
   FOLLOW,
   UNFOLLOW,
   CLEAR_SUCCESSES,
+  FORGOT_PASSWORD,
 } from "../types";
 import axios from "axios";
 import { clearErrors } from "./dataActions";
@@ -116,6 +117,25 @@ export const changePassword = (credentials) => (dispatch) =>
       dispatch({ type: SET_ERRORS, payload: err.response.data });
       dispatch({ type: CLEAR_SUCCESSES });
     });
+
+// Send password reset email
+export const sendPasswordResetEmail = (email) => (dispatch) => {
+  dispatch({ type: LOADING_UI });
+  axios
+    .post("user/forgot", email)
+    .then(() => {
+      dispatch({
+        type: SET_SUCCESSES,
+        payload: { success: "Check your email to reset password" },
+      });
+      dispatch({ type: CLEAR_ERRORS });
+    })
+    .catch((err) => {
+      console.log(err.response.data);
+      dispatch({ type: SET_ERRORS, payload: err.response.data });
+      dispatch({ type: CLEAR_SUCCESSES });
+    });
+};
 
 // Set auth header
 const setAuthorizationHeader = (token) => {

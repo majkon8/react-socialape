@@ -370,8 +370,32 @@ exports.changePassword = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      const errors = { password: "Wrong password" };
-      if (err.code === "auth/wrong-password") res.status(403).json(errors);
-      res.status(500).json({ error: err.code });
+      if (err.code === "auth/wrong-password")
+        return res.status(400).json({ password: "Wrong password" });
+      return res
+        .status(500)
+        .json({ general: "Something went wrong, please try again" });
+    });
+};
+
+// Send password reset email
+exports.sendPasswordResetEmail = (req, res) => {
+  const email = req.body.email;
+  db.collection("users")
+    .where("email", "==", email)
+    .get()
+    .then(() =>
+      firebase
+        .auth()
+        .sendPasswordResetEmail(email)
+        .then(() => res.status(200).json({ success: "success" }))
+    )
+    .catch((err) => {
+      console.error(err);
+      if (err.code === "auth/user-not-found")
+        return res.status(400).json({ email: "User not found" });
+      return res
+        .status(500)
+        .json({ general: "Something went wrong, please try again" });
     });
 };

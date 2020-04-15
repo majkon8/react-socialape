@@ -1,16 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import withStyles from "@material-ui/core/styles/withStyles";
 import MyButton from "../util/MyButton";
+import NewPasswordForm from "./NewPasswordForm";
 // Redux
 import { connect } from "react-redux";
-import {
-  editUserDetails,
-  uploadImage,
-  changePassword,
-} from "../../redux/actions/userActions";
+import { editUserDetails, uploadImage } from "../../redux/actions/userActions";
 import { clearErrors, clearSuccesses } from "../../redux/actions/uiActions";
 // MUI
+import withStyles from "@material-ui/core/styles/withStyles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -33,10 +30,7 @@ export class EditDetails extends Component {
     website: "",
     location: "",
     open: false,
-    passwordFormIsOpen: false,
-    oldPassword: "",
-    newPassword: "",
-    confirmNewPassword: "",
+    newPasswordFormIsOpen: false,
   };
 
   componentDidMount() {
@@ -87,13 +81,7 @@ export class EditDetails extends Component {
   };
 
   handleClose = () => {
-    this.setState({
-      open: false,
-      oldPassword: "",
-      newPassword: "",
-      confirmNewPassword: "",
-      passwordFormIsOpen: false,
-    });
+    this.setState({ open: false, newPasswordFormIsOpen: false });
     this.props.clearErrors();
     this.props.clearSuccesses();
   };
@@ -111,27 +99,18 @@ export class EditDetails extends Component {
 
   togglePasswordForm = () =>
     this.setState((state) => ({
-      passwordFormIsOpen: !state.passwordFormIsOpen,
+      newPasswordFormIsOpen: !state.newPasswordFormIsOpen,
     }));
 
-  handlePasswordChange = () => {
-    const { oldPassword, newPassword, confirmNewPassword } = this.state;
-    const credentials = { oldPassword, newPassword, confirmNewPassword };
-    this.props.changePassword(credentials);
-  };
-
   render() {
-    const { classes, errors, successes } = this.props;
+    const { classes } = this.props;
     const {
       nickname,
       bio,
       website,
       location,
       open,
-      passwordFormIsOpen,
-      oldPassword,
-      newPassword,
-      confirmNewPassword,
+      newPasswordFormIsOpen,
     } = this.state;
     const charactersLeftMarkup = (
       <div style={{ float: "right" }}>
@@ -217,54 +196,7 @@ export class EditDetails extends Component {
             <a style={{ cursor: "pointer" }} onClick={this.togglePasswordForm}>
               Change password
             </a>
-            {passwordFormIsOpen && (
-              <form>
-                <TextField
-                  variant="outlined"
-                  name="oldPassword"
-                  type="password"
-                  label="Old password"
-                  error={errors && errors.password ? true : false}
-                  helperText={errors && errors.password}
-                  className={classes.textField}
-                  value={oldPassword}
-                  onChange={this.handleChange}
-                  fullWidth
-                />
-                <TextField
-                  variant="outlined"
-                  name="newPassword"
-                  type="password"
-                  label="New password"
-                  error={errors && errors.newPassword ? true : false}
-                  helperText={errors && errors.newPassword}
-                  className={classes.textField}
-                  value={newPassword}
-                  onChange={this.handleChange}
-                  fullWidth
-                />
-                <TextField
-                  variant="outlined"
-                  name="confirmNewPassword"
-                  type="password"
-                  label="Repeat new password"
-                  error={errors && errors.confirmNewPassword ? true : false}
-                  helperText={errors && errors.confirmNewPassword}
-                  className={classes.textField}
-                  value={confirmNewPassword}
-                  onChange={this.handleChange}
-                  fullWidth
-                />
-                {successes && (
-                  <div style={{ color: "green", marginBottom: 10 }}>
-                    {successes.success}
-                  </div>
-                )}
-                <Button variant="contained" onClick={this.handlePasswordChange}>
-                  Save
-                </Button>
-              </form>
-            )}
+            {newPasswordFormIsOpen && <NewPasswordForm />}
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">
@@ -284,23 +216,15 @@ EditDetails.propTypes = {
   editUserDetails: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   uploadImage: PropTypes.func.isRequired,
-  changePassword: PropTypes.func.isRequired,
-  errors: PropTypes.object,
-  successes: PropTypes.object,
   clearErrors: PropTypes.func.isRequired,
   clearSuccesses: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  credentials: state.user.credentials,
-  errors: state.UI.errors,
-  successes: state.UI.successes,
-});
+const mapStateToProps = (state) => ({ credentials: state.user.credentials });
 
 const mapActionsToProps = {
   editUserDetails,
   uploadImage,
-  changePassword,
   clearErrors,
   clearSuccesses,
 };
