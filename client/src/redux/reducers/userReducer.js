@@ -7,7 +7,8 @@ import {
   UNLIKE_SCREAM,
   MARK_NOTIFICATIONS_READ,
   FOLLOW,
-  UNFOLLOW
+  UNFOLLOW,
+  STOP_LOADING_USER,
 } from "../types";
 
 const initialState = {
@@ -15,10 +16,10 @@ const initialState = {
   credentials: {},
   likes: [],
   notifications: [],
-  loading: false
+  loading: false,
 };
 
-export default function(state = initialState, action) {
+export default function (state = initialState, action) {
   switch (action.type) {
     case SET_AUTHENTICATED:
       return { ...state, authenticated: true };
@@ -28,6 +29,8 @@ export default function(state = initialState, action) {
       return { authenticated: true, loading: false, ...action.payload };
     case LOADING_USER:
       return { ...state, loading: true };
+    case STOP_LOADING_USER:
+      return { ...state, loading: false };
     case LIKE_SCREAM:
       return {
         ...state,
@@ -35,24 +38,24 @@ export default function(state = initialState, action) {
           ...state.likes,
           {
             userHandle: state.credentials.handle,
-            screamId: action.payload.screamId
-          }
-        ]
+            screamId: action.payload.screamId,
+          },
+        ],
       };
     case UNLIKE_SCREAM:
       return {
         ...state,
         likes: state.likes.filter(
-          like => like.screamId !== action.payload.screamId
-        )
+          (like) => like.screamId !== action.payload.screamId
+        ),
       };
     case MARK_NOTIFICATIONS_READ:
       return {
         ...state,
-        notifications: state.notifications.map(not => {
+        notifications: state.notifications.map((not) => {
           not.read = true;
           return not;
-        })
+        }),
       };
     case FOLLOW:
       return { ...state, credentials: { ...action.payload } };

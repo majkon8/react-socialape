@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import MyButton from "../util/MyButton";
 import Tag from "../util/Tag";
+import axios from "axios";
 // Redux
 import { connect } from "react-redux";
 import { postScream, clearErrors } from "../../redux/actions/dataActions";
@@ -16,19 +17,28 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 // Icons
 import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
+import ImageIcon from "@material-ui/icons/Image";
 
-const styles = theme => ({
+const styles = (theme) => ({
   ...theme.spreadThis,
   submitButton: { float: "right" },
   progressSpinner: { position: "absolute" },
   closeButton: { position: "absolute", left: "91%", top: "2%" },
   tagInput: { width: 100 },
   addButton: { marginLeft: 2, position: "relative", bottom: 4 },
-  tagsContainer: { display: "flex", flexWrap: "wrap", marginBottom: 10 }
+  tagsContainer: { display: "flex", flexWrap: "wrap" },
+  imgPreview: { width: 100, height: 100 },
 });
 
 class PostScream extends Component {
-  state = { open: false, body: "", errors: {}, tags: [], currentTag: "" };
+  state = {
+    open: false,
+    body: "",
+    errors: {},
+    tags: [],
+    currentTag: "",
+    imageUrl: "",
+  };
 
   static getDerivedStateFromProps(nextProps) {
     if (nextProps.UI.errors) return { errors: nextProps.UI.errors };
@@ -47,7 +57,7 @@ class PostScream extends Component {
     this.setState({ open: false, body: "" });
   };
 
-  handleChange = event => {
+  handleChange = (event) => {
     if (event.target.name === "body" && event.target.value.length > 280) return;
     else if (
       this.state[event.target.name] === "" &&
@@ -71,29 +81,48 @@ class PostScream extends Component {
       tags.length === 6
     )
       return;
-    this.setState(state => ({
+    this.setState((state) => ({
       tags: [...state.tags, state.currentTag.trim().toLowerCase()],
-      currentTag: ""
+      currentTag: "",
     }));
   };
 
-  removeTag = tagName =>
-    this.setState(state => {
-      const updatedTags = state.tags.filter(tag => tag !== tagName);
+  removeTag = (tagName) =>
+    this.setState((state) => {
+      const updatedTags = state.tags.filter((tag) => tag !== tagName);
       return { tags: [...updatedTags] };
     });
 
-  handleSubmit = event => {
+  handleAddPicture = () => {
+    const fileInput = document.getElementById("imageInput");
+    fileInput.click();
+  };
+
+  uploadScreamImage = (formData) => {
+    axios
+      .post("/scream/image", formData)
+      .then((res) => this.setState({ imageUrl: res.data.imageUrl }))
+      .catch((err) => console.log(err));
+  };
+
+  handleImageAdd = (event) => {
+    const image = event.target.files[0];
+    const formData = new FormData();
+    formData.append("image", image, image.name);
+    this.uploadScreamImage(formData);
+  };
+
+  handleSubmit = (event) => {
     event.preventDefault();
-    const { body, tags } = this.state;
-    this.props.postScream({ body, tags });
+    const { body, tags, imageUrl } = this.state;
+    this.props.postScream({ body, tags, imageUrl });
   };
 
   render() {
-    const { errors, body, currentTag, tags } = this.state;
+    const { errors, body, currentTag, tags, imageUrl } = this.state;
     const {
       classes,
-      UI: { loading }
+      UI: { loading },
     } = this.props;
     const charactersLeftMarkup = (
       <div style={{ float: "right" }}>
@@ -159,10 +188,22 @@ class PostScream extends Component {
                 <AddIcon />
               </MyButton>
               <div className={classes.tagsContainer}>
-                {tags.map(tag => (
+                {tags.map((tag) => (
                   <Tag key={tag} tagName={tag} removeTag={this.removeTag} />
                 ))}
               </div>
+              <input
+                onChange={this.handleImageAdd}
+                type="file"
+                id="imageInput"
+                hidden="hidden"
+              />
+              <MyButton onClick={this.handleAddPicture} tip="Add image">
+                <ImageIcon color="primary" />
+              </MyButton>
+              {imageUrl && (
+                <img className={classes.imgPreview} src={imageUrl} />
+              )}
               <Button
                 type="submit"
                 variant="contained"
@@ -190,10 +231,10 @@ postScream.propTypes = {
   postScream: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   UI: PropTypes.object.isRequired,
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = state => ({ UI: state.UI });
+const mapStateToProps = (state) => ({ UI: state.UI });
 
 const mapActionsToProps = { postScream, clearErrors };
 

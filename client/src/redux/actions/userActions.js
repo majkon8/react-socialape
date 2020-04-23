@@ -11,6 +11,7 @@ import {
   UNFOLLOW,
   CLEAR_SUCCESSES,
   FORGOT_PASSWORD,
+  STOP_LOADING_USER,
 } from "../types";
 import axios from "axios";
 import { clearErrors } from "./dataActions";
@@ -64,12 +65,15 @@ export const getUserData = () => (dispatch) => {
 };
 
 // Upload an image
-export const uploadImage = (formData) => (dispatch) => {
+export const uploadUserImage = (formData) => (dispatch) => {
   dispatch({ type: LOADING_USER });
   axios
     .post("/user/image", formData)
     .then(() => dispatch(getUserData()))
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      dispatch({type: STOP_LOADING_USER})
+      console.log(err);
+    });
 };
 
 // Edit user details

@@ -57,7 +57,7 @@ export default function(state = initialState, action) {
         screams: state.screams.filter(
           scream => scream.screamId !== action.payload
         ),
-        searchedScreams: state.searchedScreams.filter(
+        searchedScreams: state.searchedScreams && state.searchedScreams.filter(
           scream => scream.screamId !== action.payload
         )
       };

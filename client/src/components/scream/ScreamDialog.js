@@ -21,18 +21,18 @@ import ChatIcon from "@material-ui/icons/Chat";
 import { connect } from "react-redux";
 import { getScream, clearErrors } from "../../redux/actions/dataActions";
 
-const styles = theme => ({
+const styles = (theme) => ({
   ...theme.spreadThis,
   profileImage: {
     maxWidth: 200,
     height: 200,
     borderRadius: "50%",
-    objectFit: "cover"
+    objectFit: "cover",
   },
   dialogContent: { padding: 20 },
   closeButton: { position: "absolute", left: "90%" },
   expandButton: { position: "absolute", left: "90%" },
-  spinnerDiv: { textAlign: "center", marginTop: 50, marginBottom: 50 }
+  spinnerDiv: { textAlign: "center", marginTop: 50, marginBottom: 50 },
 });
 
 export class ScreamDialog extends Component {
@@ -70,9 +70,10 @@ export class ScreamDialog extends Component {
         userImage,
         userHandle,
         comments,
-        userNickname
+        userNickname,
+        imageUrl,
       },
-      UI: { loading }
+      UI: { loading },
     } = this.props;
 
     const dialogMarkup = loading ? (
@@ -99,6 +100,7 @@ export class ScreamDialog extends Component {
           </Typography>
           <hr className={classes.invisibleSeparator} />
           <Typography variant="body1">{body}</Typography>
+          <img src={imageUrl} />
           <LikeButton screamId={screamId} />
           <span>{likeCount} likes</span>
           <MyButton tip="comments">
@@ -149,10 +151,13 @@ ScreamDialog.propTypes = {
   screamId: PropTypes.string.isRequired,
   userHandle: PropTypes.string.isRequired,
   scream: PropTypes.object.isRequired,
-  UI: PropTypes.object.isRequired
+  UI: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = state => ({ scream: state.data.scream, UI: state.UI });
+const mapStateToProps = (state) => ({
+  scream: state.data.scream,
+  UI: state.UI,
+});
 
 const mapActionsToProps = { getScream, clearErrors };
 

@@ -10,11 +10,12 @@ const {
   deleteScream,
   deleteComment,
   searchForScreams,
+  uploadScreamImage
 } = require("./handlers/screams");
 const {
   signup,
   login,
-  uploadImage,
+  uploadUserImage,
   addUserDetails,
   getAuthenticatedUser,
   getUserDetails,
@@ -53,12 +54,13 @@ app.get("/scream/:screamId/unlike", FBAuth, unlikeScream);
 app.delete("/scream/:screamId", FBAuth, deleteScream);
 app.delete("/scream/:screamId/comment/:commentId", FBAuth, deleteComment);
 app.get("/scream/search/:tag", FBAuth, searchForScreams);
+app.post("/scream/image", FBAuth, uploadScreamImage);
 
 // USERS ROUTES
 
 app.post("/signup", signup);
 app.post("/login", login);
-app.post("/user/image", FBAuth, uploadImage);
+app.post("/user/image", FBAuth, uploadUserImage);
 app.post("/user", FBAuth, addUserDetails);
 app.get("/user", FBAuth, getAuthenticatedUser);
 app.get("/user/:handle", getUserDetails);

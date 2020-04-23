@@ -19,9 +19,14 @@ import ChatIcon from "@material-ui/icons/Chat";
 import { connect } from "react-redux";
 
 const styles = {
-  card: { display: "flex", position: "relative", marginBottom: 20, alignItems: "center" },
+  card: {
+    display: "flex",
+    position: "relative",
+    marginBottom: 20,
+    alignItems: "center",
+  },
   image: { minWidth: 200, height: 200 },
-  content: { padding: 25, objectFit: "cover" }
+  content: { padding: 25, objectFit: "cover" },
 };
 
 export class Scream extends Component {
@@ -38,12 +43,13 @@ export class Scream extends Component {
         screamId,
         likeCount,
         commentCount,
-        userNickname
+        userNickname,
+        imageUrl,
       },
       user: {
         authenticated,
-        credentials: { handle }
-      }
+        credentials: { handle },
+      },
     } = this.props;
     const deleteButton =
       authenticated && userHandle === handle ? (
@@ -70,8 +76,9 @@ export class Scream extends Component {
             {dayjs(createdAt).fromNow()}
           </Typography>
           <Typography variant="body1">{body}</Typography>
+          <img src={imageUrl} />
           <div style={{ marginTop: 5 }}>
-            {tags.map(tag => (
+            {tags.map((tag) => (
               <Typography
                 variant="body2"
                 component={Link}
@@ -108,9 +115,9 @@ Scream.propTypes = {
   user: PropTypes.object.isRequired,
   scream: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
-  openDialog: PropTypes.bool
+  openDialog: PropTypes.bool,
 };
 
-const mapStateToProps = state => ({ user: state.user });
+const mapStateToProps = (state) => ({ user: state.user });
 
 export default connect(mapStateToProps)(withStyles(styles)(Scream));

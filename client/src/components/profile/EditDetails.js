@@ -4,7 +4,7 @@ import MyButton from "../util/MyButton";
 import NewPasswordForm from "./NewPasswordForm";
 // Redux
 import { connect } from "react-redux";
-import { editUserDetails, uploadImage } from "../../redux/actions/userActions";
+import { editUserDetails, uploadUserImage } from "../../redux/actions/userActions";
 import { clearErrors, clearSuccesses } from "../../redux/actions/uiActions";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
@@ -63,7 +63,7 @@ export class EditDetails extends Component {
     const image = event.target.files[0];
     const formData = new FormData();
     formData.append("image", image, image.name);
-    this.props.uploadImage(formData);
+    this.props.uploadUserImage(formData);
   };
 
   handleEditPicture = () => {
@@ -215,7 +215,7 @@ export class EditDetails extends Component {
 EditDetails.propTypes = {
   editUserDetails: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
-  uploadImage: PropTypes.func.isRequired,
+  uploadUserImage: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   clearSuccesses: PropTypes.func.isRequired,
 };
@@ -224,7 +224,7 @@ const mapStateToProps = (state) => ({ credentials: state.user.credentials });
 
 const mapActionsToProps = {
   editUserDetails,
-  uploadImage,
+  uploadUserImage,
   clearErrors,
   clearSuccesses,
 };
