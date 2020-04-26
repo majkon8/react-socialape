@@ -14,6 +14,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Tooltip from "@material-ui/core/Tooltip";
 // Icons
 import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
@@ -27,7 +28,6 @@ const styles = (theme) => ({
   tagInput: { width: 100 },
   addButton: { marginLeft: 2, position: "relative", bottom: 4 },
   tagsContainer: { display: "flex", flexWrap: "wrap" },
-  imgPreview: { width: 100, height: 100 },
 });
 
 class PostScream extends Component {
@@ -38,7 +38,10 @@ class PostScream extends Component {
     tags: [],
     currentTag: "",
     imageUrl: "",
+    loadingImage: false,
   };
+
+  imgInputRef = React.createRef();
 
   static getDerivedStateFromProps(nextProps) {
     if (nextProps.UI.errors) return { errors: nextProps.UI.errors };
@@ -50,11 +53,26 @@ class PostScream extends Component {
       this.handleClose();
   }
 
+  uploadScreamImage = (formData) => {
+    this.setState({ loadingImage: true });
+    axios
+      .post("/scream/image", formData)
+      .then((res) => this.setState({ imageUrl: res.data.imageUrl }))
+      .catch((err) => console.log(err))
+      .finally(() => this.setState({ loadingImage: false }));
+  };
+
   handleOpen = () => this.setState({ open: true });
 
   handleClose = () => {
     this.props.clearErrors();
-    this.setState({ open: false, body: "" });
+    this.setState({
+      open: false,
+      body: "",
+      tags: [],
+      currentTag: "",
+    });
+    this.handleImageRemove();
   };
 
   handleChange = (event) => {
@@ -73,7 +91,7 @@ class PostScream extends Component {
     else this.setState({ [event.target.name]: event.target.value });
   };
 
-  addTag = () => {
+  handleTagAdd = () => {
     const { tags, currentTag } = this.state;
     if (
       tags.includes(currentTag) ||
@@ -87,7 +105,7 @@ class PostScream extends Component {
     }));
   };
 
-  removeTag = (tagName) =>
+  handleTagRemove = (tagName) =>
     this.setState((state) => {
       const updatedTags = state.tags.filter((tag) => tag !== tagName);
       return { tags: [...updatedTags] };
@@ -98,18 +116,16 @@ class PostScream extends Component {
     fileInput.click();
   };
 
-  uploadScreamImage = (formData) => {
-    axios
-      .post("/scream/image", formData)
-      .then((res) => this.setState({ imageUrl: res.data.imageUrl }))
-      .catch((err) => console.log(err));
-  };
-
   handleImageAdd = (event) => {
     const image = event.target.files[0];
     const formData = new FormData();
     formData.append("image", image, image.name);
     this.uploadScreamImage(formData);
+  };
+
+  handleImageRemove = () => {
+    this.imgInputRef.current.value = null;
+    this.setState({ imageUrl: "" });
   };
 
   handleSubmit = (event) => {
@@ -119,7 +135,14 @@ class PostScream extends Component {
   };
 
   render() {
-    const { errors, body, currentTag, tags, imageUrl } = this.state;
+    const {
+      errors,
+      body,
+      currentTag,
+      tags,
+      imageUrl,
+      loadingImage,
+    } = this.state;
     const {
       classes,
       UI: { loading },
@@ -181,7 +204,7 @@ class PostScream extends Component {
                 helperText={errors.tag}
               ></TextField>
               <MyButton
-                onClick={this.addTag}
+                onClick={this.handleTagAdd}
                 btnClassName={classes.addButton}
                 tip="Add tag (max 6)"
               >
@@ -189,7 +212,11 @@ class PostScream extends Component {
               </MyButton>
               <div className={classes.tagsContainer}>
                 {tags.map((tag) => (
-                  <Tag key={tag} tagName={tag} removeTag={this.removeTag} />
+                  <Tag
+                    key={tag}
+                    tagName={tag}
+                    removeTag={this.handleTagRemove}
+                  />
                 ))}
               </div>
               <input
@@ -197,12 +224,31 @@ class PostScream extends Component {
                 type="file"
                 id="imageInput"
                 hidden="hidden"
+                ref={this.imgInputRef}
               />
-              <MyButton onClick={this.handleAddPicture} tip="Add image">
-                <ImageIcon color="primary" />
-              </MyButton>
+              {!imageUrl && (
+                <MyButton
+                  style={{ marginBottom: 5 }}
+                  onClick={this.handleAddPicture}
+                  tip="Add image"
+                >
+                  <ImageIcon
+                    style={{ color: loadingImage ? "transparent" : "#d84315" }}
+                  />
+
+                  {loadingImage && (
+                    <CircularProgress size={30} className={classes.progress} />
+                  )}
+                </MyButton>
+              )}
               {imageUrl && (
-                <img className={classes.imgPreview} src={imageUrl} />
+                <Tooltip title="Click to remove image">
+                  <img
+                    onClick={this.handleImageRemove}
+                    className={classes.imgPreview}
+                    src={imageUrl}
+                  />
+                </Tooltip>
               )}
               <Button
                 type="submit"

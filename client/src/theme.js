@@ -4,14 +4,14 @@ export default {
       light: "#df6843",
       main: "#d84315",
       dark: "#972e0e",
-      contrastText: "#fff"
+      contrastText: "#fff",
     },
     secondary: {
       light: "#33c9dc",
       main: "#00bcd4",
       dark: "#008394",
-      contrastText: "#fff"
-    }
+      contrastText: "#fff",
+    },
   },
   typography: { useNextVariants: true },
   spreadThis: {
@@ -24,34 +24,42 @@ export default {
     customError: { color: "red", fontSize: "0.8rem", marginTop: 10 },
     progress: { position: "absolute" },
     paper: { padding: 20 },
+    imgPreview: {
+      width: 150,
+      height: 150,
+      objectFit: "cover",
+      borderRadius: 10,
+      display: "block",
+      cursor: "pointer",
+    },
     profile: {
       "& .image-wrapper": {
         textAlign: "center",
         position: "relative",
-        "& button": { position: "absolute", top: "80%", left: "70%" }
+        "& button": { position: "absolute", top: "80%", left: "70%" },
       },
       "& .profile-image": {
         width: 200,
         height: 200,
         objectFit: "cover",
         maxWidth: "100%",
-        borderRadius: "50%"
+        borderRadius: "50%",
       },
       "& .follow-number": { color: "#d84315", fontWeight: "bold" },
       "& .profile-handle": { textAlign: "center" },
       "& .profile-details": {
         textAlign: "center",
-        "& span, svg": { verticalAlign: "middle" }
+        "& span, svg": { verticalAlign: "middle" },
       },
       "& hr": { border: "none", margin: "0 0 10px 0" },
-      "& svg.button": { "& hover": { cursor: "pointer" } }
+      "& svg.button": { "& hover": { cursor: "pointer" } },
     },
     buttons: { textAlign: "center", "& a": { margin: "20px 10px" } },
     invisibleSeparator: { border: "none", margin: 4 },
     visibleSeparator: {
       width: "100%",
       borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
-      marginBottom: 20
-    }
-  }
+      marginBottom: 20,
+    },
+  },
 };

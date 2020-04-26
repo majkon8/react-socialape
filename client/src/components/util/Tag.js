@@ -11,10 +11,10 @@ const styles = {
     "&:hover": { background: "white" },
     display: "inline",
     marginRight: 5,
-    marginBottom: 5,
+    marginBottom: 15,
     position: "relative",
-    top: 4
-  }
+    top: 4,
+  },
 };
 
 export class Tag extends Component {
@@ -38,7 +38,7 @@ export class Tag extends Component {
 Tag.propTypes = {
   tagName: PropTypes.string.isRequired,
   classes: PropTypes.object.isRequired,
-  removeTag: PropTypes.func.isRequired
+  removeTag: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(Tag);

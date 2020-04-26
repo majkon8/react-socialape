@@ -13,12 +13,15 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
+import Dialog from "@material-ui/core/Dialog";
+import Tooltip from "@material-ui/core/Tooltip";
 // Icons
 import ChatIcon from "@material-ui/icons/Chat";
 // Redux
 import { connect } from "react-redux";
 
-const styles = {
+const styles = (theme) => ({
+  ...theme.spreadThis,
   card: {
     display: "flex",
     position: "relative",
@@ -27,9 +30,15 @@ const styles = {
   },
   image: { minWidth: 200, height: 200 },
   content: { padding: 25, objectFit: "cover" },
-};
+});
 
 export class Scream extends Component {
+  state = { fullImage: false };
+
+  handleClose = () => this.setState({ fullImage: false });
+
+  handleOpen = () => this.setState({ fullImage: true });
+
   render() {
     dayjs.extend(relativeTime);
     const {
@@ -76,7 +85,20 @@ export class Scream extends Component {
             {dayjs(createdAt).fromNow()}
           </Typography>
           <Typography variant="body1">{body}</Typography>
-          <img src={imageUrl} />
+          {imageUrl && (
+            <>
+              <Tooltip title="Open full size">
+                <img
+                  onClick={this.handleOpen}
+                  className={classes.imgPreview}
+                  src={imageUrl}
+                />
+              </Tooltip>
+              <Dialog open={this.state.fullImage} onClose={this.handleClose}>
+                <img style={{ width: "100%", height: "auto" }} src={imageUrl} />
+              </Dialog>
+            </>
+          )}
           <div style={{ marginTop: 5 }}>
             {tags.map((tag) => (
               <Typography
