@@ -4,7 +4,10 @@ import MyButton from "../util/MyButton";
 import NewPasswordForm from "./NewPasswordForm";
 // Redux
 import { connect } from "react-redux";
-import { editUserDetails, uploadUserImage } from "../../redux/actions/userActions";
+import {
+  editUserDetails,
+  uploadUserImage,
+} from "../../redux/actions/userActions";
 import { clearErrors, clearSuccesses } from "../../redux/actions/uiActions";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
@@ -193,9 +196,17 @@ export class EditDetails extends Component {
                 <ImageIcon color="primary" />
               </MyButton>
             </form>
-            <a style={{ cursor: "pointer" }} onClick={this.togglePasswordForm}>
+            <p
+              style={{
+                cursor: "pointer",
+                color: "#00bcd4",
+                marginBottom: 0,
+                marginTop: 7,
+              }}
+              onClick={this.togglePasswordForm}
+            >
               Change password
-            </a>
+            </p>
             {newPasswordFormIsOpen && <NewPasswordForm />}
           </DialogContent>
           <DialogActions>

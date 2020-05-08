@@ -92,10 +92,15 @@ export class Scream extends Component {
                   onClick={this.handleOpen}
                   className={classes.imgPreview}
                   src={imageUrl}
+                  alt="Scream image"
                 />
               </Tooltip>
               <Dialog open={this.state.fullImage} onClose={this.handleClose}>
-                <img style={{ width: "100%", height: "auto" }} src={imageUrl} />
+                <img
+                  style={{ width: "100%", height: "auto" }}
+                  src={imageUrl}
+                  alt="Scream image"
+                />
               </Dialog>
             </>
           )}

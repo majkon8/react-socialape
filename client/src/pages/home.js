@@ -1,13 +1,10 @@
 import React, { Component } from "react";
-import Scream from "../components/scream/Scream";
 import Profile from "../components/profile/Profile";
 import PropTypes from "prop-types";
-import ScreamSkeleton from "../components/util/ScreamSkeleton";
 import ScreamsDisplay from "../components/util/ScreamsDisplay";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
 // Redux
 import { connect } from "react-redux";
 import { getScreams } from "../redux/actions/dataActions";
@@ -20,7 +17,6 @@ export class home extends Component {
   }
 
   render() {
-    const { classes } = this.props;
     const { screams, loading } = this.props.data;
     return (
       <Grid container spacing={2}>

@@ -100,7 +100,7 @@ export class ScreamDialog extends Component {
           </Typography>
           <hr className={classes.invisibleSeparator} />
           <Typography variant="body1">{body}</Typography>
-          <img src={imageUrl} />
+          <img src={imageUrl} alt="Scream image" />
           <LikeButton screamId={screamId} />
           <span>{likeCount} likes</span>
           <MyButton tip="comments">

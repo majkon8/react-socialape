@@ -10,7 +10,6 @@ import {
   FOLLOW,
   UNFOLLOW,
   CLEAR_SUCCESSES,
-  FORGOT_PASSWORD,
   STOP_LOADING_USER,
 } from "../types";
 import axios from "axios";

@@ -6,7 +6,7 @@ import Scream from "../scream/Scream";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Typography from "@material-ui/core/Typography";
 
-const styles = theme => ({ ...theme.spreadThis });
+const styles = (theme) => ({ ...theme.spreadThis });
 
 const ScreamsDisplay = ({ loading, screams, classes }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,6 +30,7 @@ const ScreamsDisplay = ({ loading, screams, classes }) => {
       screams.map((scream, index) => {
         if (index < currentPage * 10)
           return <Scream key={scream.screamId} scream={scream} />;
+        return null;
       })
     ) : (
       <Typography variant="h5" className={classes.noData}>
@@ -46,7 +47,7 @@ const ScreamsDisplay = ({ loading, screams, classes }) => {
 ScreamsDisplay.propTypes = {
   classes: PropTypes.object.isRequired,
   screams: PropTypes.array,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
 };
 
 export default withStyles(styles)(ScreamsDisplay);

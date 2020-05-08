@@ -247,6 +247,7 @@ class PostScream extends Component {
                     onClick={this.handleImageRemove}
                     className={classes.imgPreview}
                     src={imageUrl}
+                    alt="Scream image"
                   />
                 </Tooltip>
               )}

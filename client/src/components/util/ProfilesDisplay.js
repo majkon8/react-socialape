@@ -7,13 +7,13 @@ import Masonry from "react-masonry-css";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Typography from "@material-ui/core/Typography";
 
-const styles = theme => ({ ...theme.spreadThis });
+const styles = (theme) => ({ ...theme.spreadThis });
 
 const breakpointColumnsObj = {
   default: 4,
   1100: 3,
   800: 2,
-  550: 1
+  550: 1,
 };
 
 const ProfilesDisplay = ({ users, loading, classes }) => {
@@ -52,6 +52,7 @@ const ProfilesDisplay = ({ users, loading, classes }) => {
             users.map((user, index) => {
               if (index < currentPage * 24)
                 return <StaticProfile profile={user} key={user.handle} />;
+              return null;
             })}
       </Masonry>
     );
@@ -61,7 +62,7 @@ const ProfilesDisplay = ({ users, loading, classes }) => {
 ProfilesDisplay.propTypes = {
   classes: PropTypes.object.isRequired,
   users: PropTypes.array,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
 };
 
 export default withStyles(styles)(ProfilesDisplay);
