@@ -124,7 +124,7 @@ class PostScream extends Component {
   };
 
   handleImageRemove = () => {
-    this.imgInputRef.current.value = null;
+    if (this.imgInputRef.current) this.imgInputRef.current.value = null;
     this.setState({ imageUrl: "" });
   };
 
@@ -274,7 +274,7 @@ class PostScream extends Component {
   }
 }
 
-postScream.propTypes = {
+PostScream.propTypes = {
   postScream: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   UI: PropTypes.object.isRequired,

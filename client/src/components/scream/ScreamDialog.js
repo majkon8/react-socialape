@@ -72,6 +72,9 @@ export class ScreamDialog extends Component {
         comments,
         userNickname,
         imageUrl,
+        sharedByHandle,
+        sharedByNickname,
+        sharedScreamId,
       },
       UI: { loading },
     } = this.props;
@@ -82,6 +85,25 @@ export class ScreamDialog extends Component {
       </div>
     ) : (
       <Grid container spacing={2}>
+        {sharedByHandle && (
+          <Typography variant="body2" className={classes.shareInfo}>
+            <Typography
+              variant="body2"
+              component={Link}
+              to={`/users/${userHandle}/scream/${sharedScreamId}`}
+            >
+              Scream
+            </Typography>{" "}
+            shared by{" "}
+            <Typography
+              variant="body2"
+              component={Link}
+              to={`/users/${sharedByHandle}`}
+            >
+              {sharedByNickname}
+            </Typography>
+          </Typography>
+        )}
         <Grid item sm={5}>
           <img src={userImage} alt="Profile" className={classes.profileImage} />
         </Grid>

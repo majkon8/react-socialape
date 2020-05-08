@@ -8,6 +8,7 @@ import MyButton from "../util/MyButton";
 import DeleteScream from "./DeleteScream";
 import ScreamDialog from "./ScreamDialog";
 import LikeButton from "./LikeButton";
+import ShareButton from "./ShareButton";
 // MUI
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -43,6 +44,7 @@ export class Scream extends Component {
     dayjs.extend(relativeTime);
     const {
       classes,
+      scream,
       scream: {
         body,
         tags,
@@ -54,6 +56,9 @@ export class Scream extends Component {
         commentCount,
         userNickname,
         imageUrl,
+        sharedByHandle,
+        sharedByNickname,
+        sharedScreamId,
       },
       user: {
         authenticated,
@@ -61,11 +66,30 @@ export class Scream extends Component {
       },
     } = this.props;
     const deleteButton =
-      authenticated && userHandle === handle ? (
+      authenticated && (userHandle === handle || sharedByHandle === handle) ? (
         <DeleteScream screamId={screamId} />
       ) : null;
     return (
       <Card className={classes.card}>
+        {sharedByHandle && (
+          <Typography variant="body2" className={classes.shareInfo}>
+            <Typography
+              variant="body2"
+              component={Link}
+              to={`/users/${userHandle}/scream/${sharedScreamId}`}
+            >
+              Scream
+            </Typography>{" "}
+            shared by{" "}
+            <Typography
+              variant="body2"
+              component={Link}
+              to={`/users/${sharedByHandle}`}
+            >
+              {sharedByNickname}
+            </Typography>
+          </Typography>
+        )}
         <CardMedia
           image={userImage}
           title="Profile image"
@@ -121,12 +145,13 @@ export class Scream extends Component {
           <span style={{ marginRight: 5 }}>
             {likeCount} {likeCount === 1 ? "Like" : "Likes"}
           </span>
-          <MyButton tip="comments">
+          <MyButton tip="Comments">
             <ChatIcon color="primary" />
           </MyButton>
           <span>
             {commentCount} {commentCount === 1 ? "Comment" : "Comments"}
           </span>
+          <ShareButton screamData={scream} />
           <ScreamDialog
             screamId={screamId}
             userHandle={userHandle}

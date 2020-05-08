@@ -16,16 +16,16 @@ import {
   SET_FOLLOWERS,
   SET_FOLLOWING,
   SET_SEARCHED_USERS,
-  SET_SEARCHED_SCREAMS
+  SET_SEARCHED_SCREAMS,
 } from "../types";
 import axios from "axios";
 
 // Get all screams
-export const getScreams = () => dispatch => {
+export const getScreams = () => (dispatch) => {
   dispatch({ type: LOADING_DATA });
   axios
     .get("/screams")
-    .then(res => {
+    .then((res) => {
       dispatch({ type: SET_SCREAMS, payload: res.data });
     })
     .catch(() => {
@@ -34,84 +34,95 @@ export const getScreams = () => dispatch => {
 };
 
 // Get one scream
-export const getScream = screamId => dispatch => {
+export const getScream = (screamId) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios
     .get(`/scream/${screamId}`)
-    .then(res => {
+    .then((res) => {
       dispatch({ type: SET_SCREAM, payload: res.data });
       dispatch({ type: STOP_LOADING_UI });
     })
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 };
 
 //Post a scream
-export const postScream = newScream => dispatch => {
+export const postScream = (newScream) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios
     .post("/scream", newScream)
-    .then(res => {
+    .then((res) => {
       dispatch({ type: POST_SCREAM, payload: res.data });
       dispatch(clearErrors());
     })
-    .catch(err => dispatch({ type: SET_ERRORS, payload: err.response.data }));
+    .catch((err) => dispatch({ type: SET_ERRORS, payload: err.response.data }));
+};
+
+export const shareScream = (sharedScream) => (dispatch) => {
+  dispatch({ type: LOADING_UI });
+  axios
+    .post("/scream/share", sharedScream)
+    .then((res) => {
+      dispatch({ type: POST_SCREAM, payload: res.data });
+      dispatch(clearErrors());
+    })
+    .catch((err) => dispatch({ type: SET_ERRORS, payload: err.response.data }));
 };
 
 // Like a scream
-export const likeScream = screamId => dispatch => {
+export const likeScream = (screamId) => (dispatch) => {
   axios
     .get(`/scream/${screamId}/like`)
-    .then(res => {
+    .then((res) => {
       dispatch({ type: LIKE_SCREAM, payload: res.data });
     })
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 };
 
 // Unlike a scream
-export const unlikeScream = screamId => dispatch => {
+export const unlikeScream = (screamId) => (dispatch) => {
   axios
     .get(`/scream/${screamId}/unlike`)
-    .then(res => {
+    .then((res) => {
       dispatch({ type: UNLIKE_SCREAM, payload: res.data });
     })
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 };
 
 // Submit a comment
-export const submitComment = (screamId, commentData) => dispatch => {
+export const submitComment = (screamId, commentData) => (dispatch) => {
   axios
     .post(`/scream/${screamId}/comment`, commentData)
-    .then(res => {
+    .then((res) => {
       dispatch({ type: SUBMIT_COMMENT, payload: res.data });
       dispatch(clearErrors());
     })
-    .catch(err => dispatch({ type: SET_ERRORS, payload: err.response.data }));
+    .catch((err) => dispatch({ type: SET_ERRORS, payload: err.response.data }));
 };
 
 // Delete a comment
-export const deleteComment = (screamId, commentId) => dispatch => {
+export const deleteComment = (screamId, commentId) => (dispatch) => {
   axios
     .delete(`/scream/${screamId}/comment/${commentId}`)
     .then(() =>
       dispatch({ type: DELETE_COMMENT, payload: { commentId, screamId } })
     )
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 };
 
 // Delete a scream
-export const deleteScream = screamId => dispatch => {
+export const deleteScream = (screamId) => (dispatch) => {
   axios
     .delete(`/scream/${screamId}`)
     .then(() => dispatch({ type: DELETE_SCREAM, payload: screamId }))
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 };
 
 // Get any user data
-export const getUserData = userHandle => dispatch => {
+export const getUserData = (userHandle) => (dispatch) => {
   dispatch({ type: LOADING_DATA });
   axios
     .get(`/user/${userHandle}`)
-    .then(res => {
+    .then((res) => {
       dispatch({ type: SET_SCREAMS, payload: res.data.screams });
       dispatch(setProfile(res.data.user));
     })
@@ -119,47 +130,47 @@ export const getUserData = userHandle => dispatch => {
 };
 
 // Set selected profile
-export const setProfile = payload => dispatch =>
+export const setProfile = (payload) => (dispatch) =>
   dispatch({ type: SET_PROFILE, payload: payload });
 
 // Get followers or following users details
-export const getFollowUsers = (userHandle, type) => dispatch => {
+export const getFollowUsers = (userHandle, type) => (dispatch) => {
   dispatch({ type: LOADING_DATA });
   axios
     .get(`/user/${userHandle}/${type}`)
-    .then(res => {
+    .then((res) => {
       type === "followers"
         ? dispatch(setFollowers(res.data))
         : dispatch(setFollowing(res.data));
     })
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 };
 
 // Search for users
-export const searchForUsers = name => dispatch => {
+export const searchForUsers = (name) => (dispatch) => {
   dispatch({ type: LOADING_DATA });
   axios
     .get(`/user/search/${name}`)
-    .then(res => dispatch({ type: SET_SEARCHED_USERS, payload: res.data }))
-    .catch(err => console.log(err));
+    .then((res) => dispatch({ type: SET_SEARCHED_USERS, payload: res.data }))
+    .catch((err) => console.log(err));
 };
 
 // Search for screams
-export const searchForScreams = tag => dispatch => {
+export const searchForScreams = (tag) => (dispatch) => {
   dispatch({ type: LOADING_DATA });
   axios
     .get(`/scream/search/${tag}`)
-    .then(res => dispatch({ type: SET_SEARCHED_SCREAMS, payload: res.data }))
-    .catch(err => console.log(err));
+    .then((res) => dispatch({ type: SET_SEARCHED_SCREAMS, payload: res.data }))
+    .catch((err) => console.log(err));
 };
 
 // Set followers details
-export const setFollowers = payload => dispatch =>
+export const setFollowers = (payload) => (dispatch) =>
   dispatch({ type: SET_FOLLOWERS, payload: payload });
 
 // Set following users details
-export const setFollowing = payload => dispatch =>
+export const setFollowing = (payload) => (dispatch) =>
   dispatch({ type: SET_FOLLOWING, payload: payload });
 
 // Clear errors
-export const clearErrors = () => dispatch => dispatch({ type: CLEAR_ERRORS });
+export const clearErrors = () => (dispatch) => dispatch({ type: CLEAR_ERRORS });
