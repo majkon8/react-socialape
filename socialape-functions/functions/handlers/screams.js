@@ -65,7 +65,7 @@ exports.getScream = (req, res) => {
 };
 
 // Post new scream
-exports.postOneScream = (req, res) => {
+exports.postScream = (req, res) => {
   if (req.body.body.trim() === "")
     return res.status(400).json({ body: "Body must not be empty" });
   if (req.body.body.length > 280)
@@ -82,7 +82,8 @@ exports.postOneScream = (req, res) => {
     tags: req.body.tags,
     likeCount: 0,
     commentCount: 0,
-    imageUrl: req.body.imageUrl,
+    imageUrl: req.body.imageUrl ? req.body.imageUrl : "",
+    shares: [],
   };
   db.collection("screams")
     .add(newScream)
@@ -91,6 +92,49 @@ exports.postOneScream = (req, res) => {
       resScream.screamId = doc.id;
       res.json(resScream);
     })
+    .catch((err) => {
+      res.status(500).json({ error: "Something went wrong" });
+      console.error(err);
+    });
+};
+
+exports.shareScream = (req, res) => {
+  // Not validating because user cannot modify shared scream content
+  const screamToShare = {
+    body: req.body.body,
+    tags: req.body.tags,
+    userHandle: req.user.handle,
+    userNickname: req.user.nickname,
+    createdAt: new Date().toISOString(),
+    userImage: req.body.userImage,
+    tags: req.body.tags,
+    likeCount: 0,
+    commentCount: 0,
+    imageUrl: req.body.imageUrl ? req.body.imageUrl : "",
+    shares: [],
+    sharedFromHandle: req.body.userHandle,
+    sharedFromNickname: req.body.userNickname,
+    sharedScreamId: req.body.screamId,
+  };
+  const resScream = screamToShare;
+  db.collection("screams")
+    .add(screamToShare)
+    .then((doc) => {
+      resScream.screamId = doc.id;
+      const sharedScreamDocument = db.doc(`/screams/${req.body.screamId}`);
+      return sharedScreamDocument.get();
+    })
+    .then((doc) => {
+      if (!doc.exists)
+        return res.status(404).json({ error: "Scream not found" });
+      return doc.ref.update({
+        shares: [
+          ...doc.data().shares,
+          { sharedByHandle: req.user.handle, screamId: resScream.screamId },
+        ],
+      });
+    })
+    .then(() => res.json(resScream))
     .catch((err) => {
       res.status(500).json({ error: "Something went wrong" });
       console.error(err);
@@ -151,9 +195,24 @@ exports.deleteScream = (req, res) => {
         return res.status(404).json({ error: "Scream not found" });
       if (doc.data().userHandle !== req.user.handle)
         return res.status(403).json({ error: "Unauthorized" });
-      return document.delete();
+      const sharedScreamId = doc.data().sharedScreamId;
+      if (!sharedScreamId) return document.delete();
+      document.delete();
+      const sharedScreamDocument = db.doc(`/screams/${sharedScreamId}`);
+      return sharedScreamDocument.get();
     })
-    .then(() => res.json({ message: "Scream deleted successfully" }))
+    .then((doc) => {
+      if (!doc.exists)
+        return res.json({ message: "Scream deleted successfully" });
+      doc.ref.update({
+        shares: [
+          ...doc
+            .data()
+            .shares.filter((share) => share.screamId !== req.params.screamId),
+        ],
+      });
+      return res.json({ message: "Scream deleted successfully" });
+    })
     .catch((err) => {
       console.error(err);
       return res.status(500).json({ error: err.code });

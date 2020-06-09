@@ -61,6 +61,6 @@ export default {
       borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
       marginBottom: 20,
     },
-    shareInfo: { position: "absolute", top: 5, left: 5 },
+    shareInfo: { position: "absolute", top: 5, left: 225 },
   },
 };

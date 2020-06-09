@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import LikeButton from "./LikeButton";
 import Comments from "./Comments";
 import CommentForm from "./CommentForm";
+import ShareButton from "./ShareButton";
 // MUI
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -61,6 +62,7 @@ export class ScreamDialog extends Component {
   render() {
     const {
       classes,
+      scream,
       scream: {
         screamId,
         body,
@@ -72,9 +74,10 @@ export class ScreamDialog extends Component {
         comments,
         userNickname,
         imageUrl,
-        sharedByHandle,
-        sharedByNickname,
+        sharedFromHandle,
+        sharedFromNickname,
         sharedScreamId,
+        shares,
       },
       UI: { loading },
     } = this.props;
@@ -85,7 +88,7 @@ export class ScreamDialog extends Component {
       </div>
     ) : (
       <Grid container spacing={2}>
-        {sharedByHandle && (
+        {sharedFromHandle && (
           <Typography variant="body2" className={classes.shareInfo}>
             <Typography
               variant="body2"
@@ -98,9 +101,9 @@ export class ScreamDialog extends Component {
             <Typography
               variant="body2"
               component={Link}
-              to={`/users/${sharedByHandle}`}
+              to={`/users/${userHandle}`}
             >
-              {sharedByNickname}
+              {userNickname}
             </Typography>
           </Typography>
         )}
@@ -112,9 +115,9 @@ export class ScreamDialog extends Component {
             component={Link}
             color="primary"
             variant="h5"
-            to={`/users/${userHandle}`}
+            to={`/users/${sharedFromHandle ? sharedFromHandle : userHandle}`}
           >
-            {userNickname}
+            {sharedFromHandle ? sharedFromNickname : userNickname}
           </Typography>
           <hr className={classes.invisibleSeparator} />
           <Typography variant="body2" color="textSecondary">
@@ -122,13 +125,15 @@ export class ScreamDialog extends Component {
           </Typography>
           <hr className={classes.invisibleSeparator} />
           <Typography variant="body1">{body}</Typography>
-          <img src={imageUrl} alt="Scream image" />
+          {imageUrl && <img src={imageUrl} alt="Scream image" />}
           <LikeButton screamId={screamId} />
-          <span>{likeCount} likes</span>
+          <span>{likeCount}</span>
           <MyButton tip="comments">
             <ChatIcon color="primary" />
           </MyButton>
-          <span>{commentCount} Comments</span>
+          <span>{commentCount}</span>
+          <ShareButton screamData={scream} />
+          <span>{shares && shares.length}</span>
         </Grid>
         <hr className={classes.visibleSeparator} />
         <CommentForm screamId={screamId} />

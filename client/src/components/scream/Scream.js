@@ -56,9 +56,10 @@ export class Scream extends Component {
         commentCount,
         userNickname,
         imageUrl,
-        sharedByHandle,
-        sharedByNickname,
+        sharedFromHandle,
+        sharedFromNickname,
         sharedScreamId,
+        shares
       },
       user: {
         authenticated,
@@ -66,43 +67,43 @@ export class Scream extends Component {
       },
     } = this.props;
     const deleteButton =
-      authenticated && (userHandle === handle || sharedByHandle === handle) ? (
+      authenticated && userHandle === handle ? (
         <DeleteScream screamId={screamId} />
       ) : null;
     return (
       <Card className={classes.card}>
-        {sharedByHandle && (
-          <Typography variant="body2" className={classes.shareInfo}>
-            <Typography
-              variant="body2"
-              component={Link}
-              to={`/users/${userHandle}/scream/${sharedScreamId}`}
-            >
-              Scream
-            </Typography>{" "}
-            shared by{" "}
-            <Typography
-              variant="body2"
-              component={Link}
-              to={`/users/${sharedByHandle}`}
-            >
-              {sharedByNickname}
-            </Typography>
-          </Typography>
-        )}
         <CardMedia
           image={userImage}
           title="Profile image"
           className={classes.image}
         />
         <CardContent className={classes.content}>
+          {sharedFromHandle && (
+            <Typography variant="body2" className={classes.shareInfo}>
+              <Typography
+                variant="body2"
+                component={Link}
+                to={`/users/${userHandle}/scream/${sharedScreamId}`}
+              >
+                Scream
+              </Typography>{" "}
+              shared by{" "}
+              <Typography
+                variant="body2"
+                component={Link}
+                to={`/users/${userHandle}`}
+              >
+                {userNickname}
+              </Typography>
+            </Typography>
+          )}
           <Typography
             variant="h5"
             component={Link}
-            to={`/users/${userHandle}`}
+            to={`/users/${sharedFromHandle ? sharedFromHandle : userHandle}`}
             color="primary"
           >
-            {userNickname}
+            {sharedFromHandle ? sharedFromNickname : userNickname}
           </Typography>
           {deleteButton}
           <Typography variant="body2" color="textSecondary">
@@ -143,15 +144,18 @@ export class Scream extends Component {
           </div>
           <LikeButton screamId={screamId} />
           <span style={{ marginRight: 5 }}>
-            {likeCount} {likeCount === 1 ? "Like" : "Likes"}
+            {likeCount}
           </span>
           <MyButton tip="Comments">
             <ChatIcon color="primary" />
           </MyButton>
           <span>
-            {commentCount} {commentCount === 1 ? "Comment" : "Comments"}
+            {commentCount}
           </span>
           <ShareButton screamData={scream} />
+          <span>
+            {shares.length}
+          </span>
           <ScreamDialog
             screamId={screamId}
             userHandle={userHandle}

@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const app = require("express")();
 const {
   getAllScreams,
-  postOneScream,
+  postScream,
   getScream,
   commentOnScream,
   likeScream,
@@ -10,7 +10,8 @@ const {
   deleteScream,
   deleteComment,
   searchForScreams,
-  uploadScreamImage
+  uploadScreamImage,
+  shareScream,
 } = require("./handlers/screams");
 const {
   signup,
@@ -37,6 +38,8 @@ const {
   handleOnNicknameChange,
   handleCreateNotificationOnFollow,
   handleDeleteNotificationOnUnfollow,
+  handleCreateNotificationOnShare,
+  handleDeleteNotificationOnUnshare,
 } = require("./dbtriggers");
 const FBAuth = require("./util/fbAuth");
 const cors = require("cors");
@@ -46,7 +49,7 @@ app.use(cors());
 // SCREAM ROUTES
 
 app.get("/screams", FBAuth, getAllScreams);
-app.post("/scream", FBAuth, postOneScream);
+app.post("/scream", FBAuth, postScream);
 app.get("/scream/:screamId", getScream);
 app.post("/scream/:screamId/comment", FBAuth, commentOnScream);
 app.get("/scream/:screamId/like", FBAuth, likeScream);
@@ -55,6 +58,7 @@ app.delete("/scream/:screamId", FBAuth, deleteScream);
 app.delete("/scream/:screamId/comment/:commentId", FBAuth, deleteComment);
 app.get("/scream/search/:tag", FBAuth, searchForScreams);
 app.post("/scream/image", FBAuth, uploadScreamImage);
+app.post("/scream/share", FBAuth, shareScream);
 
 // USERS ROUTES
 
@@ -115,6 +119,17 @@ exports.deleteNotificationOnUnfollow = functions
   .region("europe-west1")
   .firestore.document("/users/{userId}")
   .onUpdate(handleDeleteNotificationOnUnfollow);
+
+// Handle notificiation on share
+exports.createNotificationOnShare = functions
+  .region("europe-west1")
+  .firestore.document("/screams/{screamId}")
+  .onUpdate(handleCreateNotificationOnShare);
+
+exports.deleteNotificationOnUnshare = functions
+  .region("europe-west1")
+  .firestore.document("/screams/{screamId}")
+  .onUpdate(handleDeleteNotificationOnUnshare);
 
 // Handle user image change
 exports.onUserImageChange = functions

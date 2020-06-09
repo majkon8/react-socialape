@@ -12,7 +12,8 @@ import {
   SET_FOLLOWERS,
   SET_FOLLOWING,
   SET_SEARCHED_USERS,
-  SET_SEARCHED_SCREAMS
+  SET_SEARCHED_SCREAMS,
+  SHARE_SCREAM,
 } from "../types";
 
 const initialState = {
@@ -23,10 +24,10 @@ const initialState = {
   followersDetails: null,
   followingUsersDetails: null,
   searchedUsers: null,
-  searchedScreams: null
+  searchedScreams: null,
 };
 
-export default function(state = initialState, action) {
+export default function (state = initialState, action) {
   let updatedScream;
   switch (action.type) {
     case LOADING_DATA:
@@ -39,7 +40,7 @@ export default function(state = initialState, action) {
       return { ...state, profile: action.payload };
     case LIKE_SCREAM:
     case UNLIKE_SCREAM:
-      const updatedScreams = state.screams.map(scream => {
+      const updatedScreamsForLike = state.screams.map((scream) => {
         scream.screamId === action.payload.screamId &&
           (scream.likeCount = action.payload.likeCount);
         return { ...scream };
@@ -48,47 +49,56 @@ export default function(state = initialState, action) {
       updatedScream.likeCount = action.payload.likeCount;
       return {
         ...state,
-        screams: updatedScreams,
-        scream: updatedScream
+        screams: updatedScreamsForLike,
+        scream: updatedScream,
       };
     case DELETE_SCREAM:
       return {
         ...state,
         screams: state.screams.filter(
-          scream => scream.screamId !== action.payload
+          (scream) => scream.screamId !== action.payload
         ),
-        searchedScreams: state.searchedScreams && state.searchedScreams.filter(
-          scream => scream.screamId !== action.payload
-        )
+        searchedScreams:
+          state.searchedScreams &&
+          state.searchedScreams.filter(
+            (scream) => scream.screamId !== action.payload
+          ),
       };
     case POST_SCREAM:
       return { ...state, screams: [action.payload, ...state.screams] };
+    case SHARE_SCREAM:
+      const updatedScreamsForShare = state.screams.map((scream) => {
+        scream.screamId === action.payload.sharedScreamId &&
+          (scream.shares = [...scream.shares, {}]);
+        return { ...scream };
+      });
+      return { ...state, screams: [action.payload, ...updatedScreamsForShare] };
     case SUBMIT_COMMENT:
       return {
         ...state,
-        screams: state.screams.map(scream => {
+        screams: state.screams.map((scream) => {
           scream.screamId === action.payload.screamId && scream.commentCount++;
           return { ...scream };
         }),
         scream: {
           ...state.scream,
           comments: [action.payload, ...state.scream.comments],
-          commentCount: state.scream.commentCount + 1
-        }
+          commentCount: state.scream.commentCount + 1,
+        },
       };
     case DELETE_COMMENT:
       updatedScream = { ...state.scream };
       updatedScream.comments = state.scream.comments.filter(
-        comment => comment.commentId !== action.payload.commentId
+        (comment) => comment.commentId !== action.payload.commentId
       );
       updatedScream.commentCount--;
       return {
         ...state,
-        screams: state.screams.map(scream => {
+        screams: state.screams.map((scream) => {
           scream.screamId === action.payload.screamId && scream.commentCount--;
           return { ...scream };
         }),
-        scream: updatedScream
+        scream: updatedScream,
       };
     case SET_FOLLOWERS:
       return { ...state, followersDetails: action.payload, loading: false };
@@ -96,7 +106,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         followingUsersDetails: action.payload,
-        loading: false
+        loading: false,
       };
     case SET_SEARCHED_USERS:
       return { ...state, searchedUsers: action.payload, loading: false };

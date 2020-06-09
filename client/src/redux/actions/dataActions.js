@@ -17,6 +17,7 @@ import {
   SET_FOLLOWING,
   SET_SEARCHED_USERS,
   SET_SEARCHED_SCREAMS,
+  SHARE_SCREAM,
 } from "../types";
 import axios from "axios";
 
@@ -62,7 +63,7 @@ export const shareScream = (sharedScream) => (dispatch) => {
   axios
     .post("/scream/share", sharedScream)
     .then((res) => {
-      dispatch({ type: POST_SCREAM, payload: res.data });
+      dispatch({ type: SHARE_SCREAM, payload: res.data });
       dispatch(clearErrors());
     })
     .catch((err) => dispatch({ type: SET_ERRORS, payload: err.response.data }));
