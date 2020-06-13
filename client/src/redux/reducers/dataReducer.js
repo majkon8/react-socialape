@@ -14,6 +14,7 @@ import {
   SET_SEARCHED_USERS,
   SET_SEARCHED_SCREAMS,
   SHARE_SCREAM,
+  REPLY_TO_SCREAM,
 } from "../types";
 
 const initialState = {
@@ -73,6 +74,13 @@ export default function (state = initialState, action) {
         return { ...scream };
       });
       return { ...state, screams: [action.payload, ...updatedScreamsForShare] };
+    case REPLY_TO_SCREAM:
+      const updatedScreamsForReply = state.screams.map((scream) => {
+        scream.screamId === action.payload.repliedScreamId &&
+          (scream.replies = [...scream.replies, {}]);
+        return { ...scream };
+      });
+      return { ...state, screams: [action.payload, ...updatedScreamsForReply] };
     case SUBMIT_COMMENT:
       return {
         ...state,

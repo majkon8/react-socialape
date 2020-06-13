@@ -16,7 +16,7 @@ import HomeIcon from "@material-ui/icons/Home";
 import { connect } from "react-redux";
 import { clearErrors } from "../../redux/actions/dataActions";
 
-const styles = theme => ({ ...theme.spreadThis });
+const styles = (theme) => ({ ...theme.spreadThis });
 
 export class Navbar extends Component {
   render() {
@@ -72,10 +72,12 @@ export class Navbar extends Component {
 
 Navbar.propTypes = {
   authenticated: PropTypes.bool.isRequired,
-  clearErrors: PropTypes.func.isRequired
+  clearErrors: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({ authenticated: state.user.authenticated });
+const mapStateToProps = (state) => ({
+  authenticated: state.user.authenticated,
+});
 
 export default connect(mapStateToProps, { clearErrors })(
   withStyles(styles)(Navbar)

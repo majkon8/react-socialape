@@ -9,6 +9,7 @@ import DeleteScream from "./DeleteScream";
 import ScreamDialog from "./ScreamDialog";
 import LikeButton from "./LikeButton";
 import ShareButton from "./ShareButton";
+import PostScream from "./PostScream";
 // MUI
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -59,7 +60,12 @@ export class Scream extends Component {
         sharedFromHandle,
         sharedFromNickname,
         sharedScreamId,
-        shares
+        shares,
+        repliedScreamBody,
+        repliedScreamId,
+        replyToHandle,
+        replyToNickname,
+        replies,
       },
       user: {
         authenticated,
@@ -109,6 +115,27 @@ export class Scream extends Component {
           <Typography variant="body2" color="textSecondary">
             {dayjs(createdAt).fromNow()}
           </Typography>
+          {repliedScreamId && (
+            <div className={classes.replyContent}>
+              <Typography variant="body2">
+                <Typography
+                  variant="body2"
+                  component={Link}
+                  to={`/users/${replyToHandle}`}
+                >
+                  {replyToNickname}
+                </Typography>{" "}
+                <Typography
+                  variant="body2"
+                  component={Link}
+                  to={`/users/${replyToHandle}/scream/${repliedScreamId}`}
+                >
+                  screamed:
+                </Typography>{" "}
+              </Typography>
+              <Typography variant="body2">{repliedScreamBody}</Typography>
+            </div>
+          )}
           <Typography variant="body1">{body}</Typography>
           {imageUrl && (
             <>
@@ -143,19 +170,19 @@ export class Scream extends Component {
             ))}
           </div>
           <LikeButton screamId={screamId} />
-          <span style={{ marginRight: 5 }}>
-            {likeCount}
-          </span>
+          <span style={{ marginRight: 5 }}>{likeCount}</span>
           <MyButton tip="Comments">
             <ChatIcon color="primary" />
           </MyButton>
-          <span>
-            {commentCount}
-          </span>
+          <span>{commentCount}</span>
           <ShareButton screamData={scream} />
-          <span>
-            {shares.length}
-          </span>
+          <span>{shares.length}</span>
+          {!sharedScreamId && (
+            <>
+              <PostScream replyScreamData={scream} />
+              <span>{replies.length}</span>
+            </>
+          )}
           <ScreamDialog
             screamId={screamId}
             userHandle={userHandle}

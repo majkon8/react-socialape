@@ -78,6 +78,10 @@ export class ScreamDialog extends Component {
         sharedFromNickname,
         sharedScreamId,
         shares,
+        repliedScreamBody,
+        repliedScreamId,
+        replyToHandle,
+        replyToNickname,
       },
       UI: { loading },
     } = this.props;
@@ -124,6 +128,27 @@ export class ScreamDialog extends Component {
             {dayjs(createdAt).format("h:mm a, MMMM DD YYYY")}
           </Typography>
           <hr className={classes.invisibleSeparator} />
+          {repliedScreamId && (
+            <div className={classes.replyContent}>
+              <Typography variant="body2">
+                <Typography
+                  variant="body2"
+                  component={Link}
+                  to={`/users/${replyToHandle}`}
+                >
+                  {replyToNickname}
+                </Typography>{" "}
+                <Typography
+                  variant="body2"
+                  component={Link}
+                  to={`/users/${replyToHandle}/scream/${repliedScreamId}`}
+                >
+                  screamed:
+                </Typography>{" "}
+              </Typography>
+              <Typography variant="body2">{repliedScreamBody}</Typography>
+            </div>
+          )}
           <Typography variant="body1">{body}</Typography>
           {imageUrl && <img src={imageUrl} alt="Scream image" />}
           <LikeButton screamId={screamId} />
@@ -156,13 +181,16 @@ export class ScreamDialog extends Component {
           fullWidth
           maxWidth="sm"
         >
-          <MyButton
-            tip="Close"
-            onClick={this.handleClose}
-            tipClassName={classes.closeButton}
-          >
-            <CloseIcon />
-          </MyButton>
+          <Link to={`/users/${scream.userHandle}`}>
+            <MyButton
+              tip="Close"
+              onClick={this.handleClose}
+              tipClassName={classes.closeButton}
+            >
+              <CloseIcon />
+            </MyButton>
+          </Link>
+
           <DialogContent className={classes.dialogContent}>
             {dialogMarkup}
           </DialogContent>
@@ -179,6 +207,7 @@ ScreamDialog.propTypes = {
   userHandle: PropTypes.string.isRequired,
   scream: PropTypes.object.isRequired,
   UI: PropTypes.object.isRequired,
+  openDialog: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({

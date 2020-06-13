@@ -5,7 +5,11 @@ import Tag from "../util/Tag";
 import axios from "axios";
 // Redux
 import { connect } from "react-redux";
-import { postScream, clearErrors } from "../../redux/actions/dataActions";
+import {
+  postScream,
+  clearErrors,
+  replyToScream,
+} from "../../redux/actions/dataActions";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
 import Button from "@material-ui/core/Button";
@@ -19,6 +23,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
 import ImageIcon from "@material-ui/icons/Image";
+import ReplyIcon from "@material-ui/icons/Reply";
 
 const styles = (theme) => ({
   ...theme.spreadThis,
@@ -131,7 +136,10 @@ class PostScream extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     const { body, tags, imageUrl } = this.state;
-    this.props.postScream({ body, tags, imageUrl });
+    const { replyScreamData } = this.props;
+    replyScreamData
+      ? this.props.replyToScream({ body, tags, imageUrl, replyScreamData })
+      : this.props.postScream({ body, tags, imageUrl });
   };
 
   render() {
@@ -146,6 +154,7 @@ class PostScream extends Component {
     const {
       classes,
       UI: { loading },
+      replyScreamData,
     } = this.props;
     const charactersLeftMarkup = (
       <div style={{ float: "right" }}>
@@ -155,11 +164,18 @@ class PostScream extends Component {
         </span>
       </div>
     );
+    const icon = replyScreamData ? (
+      <MyButton onClick={this.handleOpen} tip="Reply">
+        <ReplyIcon color="primary" />
+      </MyButton>
+    ) : (
+      <MyButton onClick={this.handleOpen} tip="Post a Scream!">
+        <AddIcon />
+      </MyButton>
+    );
     return (
       <>
-        <MyButton onClick={this.handleOpen} tip="Post a Scream!">
-          <AddIcon />
-        </MyButton>
+        {icon}
         <Dialog
           open={this.state.open}
           onClose={this.handleClose}
@@ -173,7 +189,9 @@ class PostScream extends Component {
           >
             <CloseIcon />
           </MyButton>
-          <DialogTitle>Post a new scream</DialogTitle>
+          <DialogTitle>
+            {replyScreamData ? "Reply to scream" : "Post a new scream"}
+          </DialogTitle>
           <DialogContent>
             <form onSubmit={this.handleSubmit}>
               <TextField
@@ -276,14 +294,16 @@ class PostScream extends Component {
 
 PostScream.propTypes = {
   postScream: PropTypes.func.isRequired,
+  replyToScream: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   UI: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
+  replyScreamData: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({ UI: state.UI });
 
-const mapActionsToProps = { postScream, clearErrors };
+const mapActionsToProps = { postScream, clearErrors, replyToScream };
 
 export default connect(
   mapStateToProps,

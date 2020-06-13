@@ -16,6 +16,7 @@ import ChatIcon from "@material-ui/icons/Chat";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import ShareIcon from "@material-ui/icons/Share";
+import ReplyIcon from "@material-ui/icons/Reply";
 // Redux
 import { connect } from "react-redux";
 import { markNotificationsRead } from "../../redux/actions/userActions";
@@ -80,6 +81,11 @@ export class Notifications extends Component {
                 <ShareIcon color={iconColor} style={{ marginRight: 10 }} />
               );
               break;
+            case "reply":
+              verb = "replied";
+              icon = (
+                <ReplyIcon color={iconColor} style={{ marginRight: 10 }} />
+              );
             default:
               break;
           }
@@ -92,7 +98,7 @@ export class Notifications extends Component {
                 to={
                   not.type === "follow"
                     ? `/users/${not.sender}`
-                    : not.type === "share"
+                    : not.type === "share" || not.type === "reply"
                     ? `/users/${not.sender}/scream/${not.screamId}`
                     : `/users/${not.recipient}/scream/${not.screamId}`
                 }

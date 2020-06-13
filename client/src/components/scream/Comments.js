@@ -34,7 +34,7 @@ export class Comments extends Component {
     } = this.props;
     return (
       <Grid container>
-        {comments.map((comment, index) => {
+        {comments && comments.map((comment, index) => {
           const {
             commentId,
             body,

@@ -18,6 +18,7 @@ import {
   SET_SEARCHED_USERS,
   SET_SEARCHED_SCREAMS,
   SHARE_SCREAM,
+  REPLY_TO_SCREAM,
 } from "../types";
 import axios from "axios";
 
@@ -64,6 +65,17 @@ export const shareScream = (sharedScream) => (dispatch) => {
     .post("/scream/share", sharedScream)
     .then((res) => {
       dispatch({ type: SHARE_SCREAM, payload: res.data });
+      dispatch(clearErrors());
+    })
+    .catch((err) => dispatch({ type: SET_ERRORS, payload: err.response.data }));
+};
+
+export const replyToScream = (reply) => (dispatch) => {
+  dispatch({ type: LOADING_UI });
+  axios
+    .post("/scream/reply", reply)
+    .then((res) => {
+      dispatch({ type: REPLY_TO_SCREAM, payload: res.data });
       dispatch(clearErrors());
     })
     .catch((err) => dispatch({ type: SET_ERRORS, payload: err.response.data }));

@@ -43,9 +43,9 @@ class user extends Component {
     ) : screams === null ? (
       <p>No screams from this user</p>
     ) : !screamIdParam ? (
-      screams.map(scream => <Scream key={scream.screamId} scream={scream} />)
+      screams.map((scream) => <Scream key={scream.screamId} scream={scream} />)
     ) : (
-      screams.map(scream => {
+      screams.map((scream) => {
         if (scream.screamId !== screamIdParam)
           return <Scream key={scream.screamId} scream={scream} />;
         return <Scream key={scream.screamId} scream={scream} openDialog />;
@@ -71,10 +71,10 @@ class user extends Component {
 user.propTypes = {
   getUserData: PropTypes.func.isRequired,
   setProfile: PropTypes.func.isRequired,
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = state => ({ data: state.data });
+const mapStateToProps = (state) => ({ data: state.data });
 
 const mapActionsToProps = { getUserData, setProfile };
 

@@ -62,5 +62,10 @@ export default {
       marginBottom: 20,
     },
     shareInfo: { position: "absolute", top: 5, left: 225 },
+    replyContent: {
+      background: "rgba(0,0,0,0.1)",
+      padding: 5,
+      borderRadius: 5,
+    },
   },
 };
