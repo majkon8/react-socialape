@@ -12,6 +12,7 @@ const {
   searchForScreams,
   uploadScreamImage,
   shareScream,
+  replyToScream,
 } = require("./handlers/screams");
 const {
   signup,
@@ -40,6 +41,8 @@ const {
   handleDeleteNotificationOnUnfollow,
   handleCreateNotificationOnShare,
   handleDeleteNotificationOnUnshare,
+  handleCreateNotificationOnReply,
+  handleDeleteNotificationOnUnreply,
 } = require("./dbtriggers");
 const FBAuth = require("./util/fbAuth");
 const cors = require("cors");
@@ -59,6 +62,7 @@ app.delete("/scream/:screamId/comment/:commentId", FBAuth, deleteComment);
 app.get("/scream/search/:tag", FBAuth, searchForScreams);
 app.post("/scream/image", FBAuth, uploadScreamImage);
 app.post("/scream/share", FBAuth, shareScream);
+app.post("/scream/reply", FBAuth, replyToScream);
 
 // USERS ROUTES
 
@@ -130,6 +134,17 @@ exports.deleteNotificationOnUnshare = functions
   .region("europe-west1")
   .firestore.document("/screams/{screamId}")
   .onUpdate(handleDeleteNotificationOnUnshare);
+
+// Handle notification on reply
+exports.createNotificationOnReply = functions
+  .region("europe-west1")
+  .firestore.document("/screams/{screamId}")
+  .onUpdate(handleCreateNotificationOnReply);
+
+exports.deleteNotificationOnUnreply = functions
+  .region("europe-west1")
+  .firestore.document("/screams/{screamId}")
+  .onUpdate(handleDeleteNotificationOnUnreply);
 
 // Handle user image change
 exports.onUserImageChange = functions

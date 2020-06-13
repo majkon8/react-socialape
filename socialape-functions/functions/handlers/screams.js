@@ -84,13 +84,14 @@ exports.postScream = (req, res) => {
     commentCount: 0,
     imageUrl: req.body.imageUrl ? req.body.imageUrl : "",
     shares: [],
+    replies: [],
   };
   db.collection("screams")
     .add(newScream)
     .then((doc) => {
-      const resScream = newScream;
-      resScream.screamId = doc.id;
-      res.json(resScream);
+      const responseScream = newScream;
+      responseScream.screamId = doc.id;
+      res.json(responseScream);
     })
     .catch((err) => {
       res.status(500).json({ error: "Something went wrong" });
@@ -112,15 +113,22 @@ exports.shareScream = (req, res) => {
     commentCount: 0,
     imageUrl: req.body.imageUrl ? req.body.imageUrl : "",
     shares: [],
+    replies: [],
     sharedFromHandle: req.body.userHandle,
     sharedFromNickname: req.body.userNickname,
     sharedScreamId: req.body.screamId,
+    replyToHandle: req.body.replyToHandle ? req.body.replyToHandle : null,
+    replyToNickname: req.body.replyToNickname ? req.body.replyToNickname : null,
+    repliedScreamId: req.body.repliedScreamId ? req.body.repliedScreamId : null,
+    repliedScreamBody: req.body.repliedScreamBody
+      ? req.body.repliedScreamBody
+      : null,
   };
-  const resScream = screamToShare;
+  const responseScream = screamToShare;
   db.collection("screams")
     .add(screamToShare)
     .then((doc) => {
-      resScream.screamId = doc.id;
+      responseScream.screamId = doc.id;
       const sharedScreamDocument = db.doc(`/screams/${req.body.screamId}`);
       return sharedScreamDocument.get();
     })
@@ -130,11 +138,70 @@ exports.shareScream = (req, res) => {
       return doc.ref.update({
         shares: [
           ...doc.data().shares,
-          { sharedByHandle: req.user.handle, screamId: resScream.screamId },
+          {
+            sharedByHandle: req.user.handle,
+            screamId: responseScream.screamId,
+          },
         ],
       });
     })
-    .then(() => res.json(resScream))
+    .then(() => res.json(responseScream))
+    .catch((err) => {
+      res.status(500).json({ error: "Something went wrong" });
+      console.error(err);
+    });
+};
+
+// Reply to scream
+exports.replyToScream = (req, res) => {
+  if (req.body.body.trim() === "")
+    return res.status(400).json({ body: "Body must not be empty" });
+  if (req.body.body.length > 280)
+    return res.status(400).json({ body: "Too long scream content" });
+  if (req.body.tags.length > 6)
+    return res.status(400).json({ tag: "Too many tags" });
+  const newReply = {
+    body: req.body.body,
+    tags: req.body.tags,
+    userHandle: req.user.handle,
+    userNickname: req.user.nickname,
+    createdAt: new Date().toISOString(),
+    userImage: req.user.imageUrl,
+    tags: req.body.tags,
+    likeCount: 0,
+    commentCount: 0,
+    imageUrl: req.body.imageUrl ? req.body.imageUrl : "",
+    shares: [],
+    replies: [],
+    replyToHandle: req.body.replyScreamData.userHandle,
+    replyToNickname: req.body.replyScreamData.userNickname,
+    repliedScreamId: req.body.replyScreamData.screamId,
+    repliedScreamBody: req.body.replyScreamData.body,
+  };
+  const responseScream = newReply;
+  db.collection("screams")
+    .add(newReply)
+    .then((doc) => {
+      responseScream.screamId = doc.id;
+      const repliedScreamDocument = db.doc(
+        `/screams/${req.body.replyScreamData.screamId}`
+      );
+      return repliedScreamDocument.get();
+    })
+    .then((doc) => {
+      if (!doc.exists)
+        return res.status(404).json({ error: "Scream not found" });
+      return doc.ref.update({
+        replies: [
+          ...doc.data().replies,
+          {
+            replyFromHandle: req.user.handle,
+            screamId: responseScream.screamId,
+          },
+        ],
+      });
+    })
+    .then(() => res.json(responseScream))
     .catch((err) => {
       res.status(500).json({ error: "Something went wrong" });
       console.error(err);
@@ -196,10 +263,17 @@ exports.deleteScream = (req, res) => {
       if (doc.data().userHandle !== req.user.handle)
         return res.status(403).json({ error: "Unauthorized" });
       const sharedScreamId = doc.data().sharedScreamId;
-      if (!sharedScreamId) return document.delete();
+      const repliedScreamId = doc.data().repliedScreamId;
+      if (!sharedScreamId && !repliedScreamId) return document.delete();
       document.delete();
-      const sharedScreamDocument = db.doc(`/screams/${sharedScreamId}`);
-      return sharedScreamDocument.get();
+      if (sharedScreamId) {
+        const sharedScreamDocument = db.doc(`/screams/${sharedScreamId}`);
+        return sharedScreamDocument.get();
+      }
+      if (repliedScreamId) {
+        const repliedScreamDocument = db.doc(`/screams/${repliedScreamId}`);
+        return repliedScreamDocument.get();
+      }
     })
     .then((doc) => {
       if (!doc.exists)
@@ -209,6 +283,13 @@ exports.deleteScream = (req, res) => {
           ...doc
             .data()
             .shares.filter((share) => share.screamId !== req.params.screamId),
+        ],
+      });
+      doc.ref.update({
+        replies: [
+          ...doc
+            .data()
+            .replies.filter((reply) => reply.screamId !== req.params.screamId),
         ],
       });
       return res.json({ message: "Scream deleted successfully" });

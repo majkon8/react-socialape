@@ -16,10 +16,11 @@ exports.handleCreateNotificationOnLike = (snapshot) =>
           screamId: doc.id,
         });
       }
+      return null;
     })
     .catch((err) => {
       console.error(err);
-      return;
+      return null;
     });
 
 // Delete notification on unlike handler
@@ -29,7 +30,7 @@ exports.handleDeleteNotificationOnUnlike = (snapshot) => {
     .delete()
     .catch((err) => {
       console.error(err);
-      return;
+      return null;
     });
 };
 
@@ -49,10 +50,11 @@ exports.handleCreateNotificationOnComment = (snapshot) => {
           screamId: doc.id,
         });
       }
+      return null;
     })
     .catch((err) => {
       console.error(err);
-      return;
+      return null;
     });
 };
 
@@ -63,7 +65,7 @@ exports.handleDeleteNotificationOnCommentDelete = (snapshot) => {
     .delete()
     .catch((err) => {
       console.error(err);
-      return;
+      return null;
     });
 };
 
@@ -87,19 +89,23 @@ exports.handleCreateNotificationOnFollow = (change) => {
       })
       .catch((err) => {
         console.error(err);
-        return;
+        return null;
       });
   }
   return null;
 };
 
+// Create notification on sharing post
 exports.handleCreateNotificationOnShare = (change) => {
   const dataBefore = change.before.data();
   const dataAfter = change.after.data();
   const newShare = dataAfter.shares.filter(
     (share) => !dataBefore.shares.includes(share)
   );
-  if (newShare.length > 0)
+  if (
+    newShare.length > 0 &&
+    dataBefore.userHandle !== newShare[0].sharedByHandle
+  )
     return db
       .doc(`/notifications/${newShare[0].screamId}`)
       .set({
@@ -112,11 +118,58 @@ exports.handleCreateNotificationOnShare = (change) => {
       })
       .catch((err) => {
         console.error(err);
-        return;
+        return null;
       });
-  return;
+  return null;
 };
 
+// Create notification on reply to post
+exports.handleCreateNotificationOnReply = (change) => {
+  const dataBefore = change.before.data();
+  const dataAfter = change.after.data();
+  const newReply = dataAfter.replies.filter(
+    (reply) => !dataBefore.replies.includes(reply)
+  );
+  if (
+    newReply.length > 0 &&
+    dataBefore.userHandle !== newReply[0].replyFromHandle
+  )
+    return db
+      .doc(`/notifications/${newReply[0].screamId}`)
+      .set({
+        createdAt: new Date().toISOString(),
+        recipient: dataBefore.userHandle,
+        sender: newReply[0].replyFromHandle,
+        screamId: newReply[0].screamId,
+        type: "reply",
+        read: false,
+      })
+      .catch((err) => {
+        console.error(err);
+        return null;
+      });
+  return null;
+};
+
+// Delete notification when delete reply to post
+exports.handleDeleteNotificationOnUnreply = (change) => {
+  const dataBefore = change.before.data();
+  const dataAfter = change.after.data();
+  const unreply = dataBefore.replies.filter(
+    (reply) => !dataAfter.replies.includes(reply)
+  );
+  if (unreply.length > 0)
+    return db
+      .doc(`notifications/${unreply[0].screamId}`)
+      .delete()
+      .catch((err) => {
+        console.error(err);
+        return null;
+      });
+  return null;
+};
+
+// Delete notification when delete shared post
 exports.handleDeleteNotificationOnUnshare = (change) => {
   const dataBefore = change.before.data();
   const dataAfter = change.after.data();
@@ -129,8 +182,9 @@ exports.handleDeleteNotificationOnUnshare = (change) => {
       .delete()
       .catch((err) => {
         console.error(err);
-        return;
+        return null;
       });
+  return null;
 };
 
 // Delete notification on unfollow
@@ -147,7 +201,7 @@ exports.handleDeleteNotificationOnUnfollow = (change) => {
       .delete()
       .catch((err) => {
         console.error(err);
-        return;
+        return null;
       });
   }
   return null;
@@ -182,7 +236,7 @@ exports.handleOnUserImageChange = (change) => {
       })
       .catch((err) => {
         console.error(err);
-        return;
+        return null;
       });
   } else return true;
 };
@@ -192,6 +246,7 @@ exports.handleOnNicknameChange = (change) => {
   const nicknameAfterChange = change.after.data().nickname;
   if (change.before.data().nickname !== nicknameAfterChange) {
     const handleBeforeChange = change.before.data().handle;
+    const nicknameBeforeChange = change.before.data().nickname;
     const batch = db.batch();
     return db
       .collection("screams")
@@ -216,19 +271,29 @@ exports.handleOnNicknameChange = (change) => {
         });
         return db
           .collection("screams")
-          .where("sharedByHandle", "==", handleBeforeChange)
+          .where("sharedFromNickname", "==", nicknameBeforeChange)
           .get();
       })
       .then((data) => {
         data.forEach((doc) => {
           const scream = db.doc(`/screams/${doc.id}`);
-          batch.update(scream, { sharedByNickname: nicknameAfterChange });
+          batch.update(scream, { sharedFromNickname: nicknameAfterChange });
+        });
+        return db
+          .collection("screams")
+          .where("replyToNickname", "==", nicknameBeforeChange)
+          .get();
+      })
+      .then((data) => {
+        data.forEach((doc) => {
+          const scream = db.doc(`/screams/${doc.id}`);
+          batch.update(scream, { replyToNickname: nicknameAfterChange });
         });
         return batch.commit();
       })
       .catch((err) => {
         console.error(err);
-        return;
+        return null;
       });
   } else return true;
 };
@@ -264,6 +329,6 @@ exports.handleOnScreamDelete = (snapshot, context) => {
     })
     .catch((err) => {
       console.error(err);
-      return;
+      return null;
     });
 };
