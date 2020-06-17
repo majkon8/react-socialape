@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -9,13 +9,15 @@ import "./App.css";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import themeFile from "./theme";
-import jwtDecode from "jwt-decode";
 import axios from "axios";
 //Redux
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import { SET_AUTHENTICATED } from "./redux/types";
-import { logoutUser, getUserData } from "./redux/actions/userActions";
+import {
+  getUserData,
+  setAuthorizationHeader,
+} from "./redux/actions/userActions";
 // Components
 import Navbar from "./components/layout/Navbar";
 import AuthRoute from "./components/util/AuthRoute";
@@ -34,20 +36,24 @@ const theme = createMuiTheme(themeFile);
 axios.defaults.baseURL =
   "https://europe-west1-socialape-98946.cloudfunctions.net/api";
 
+const refreshToken = () => {
+  axios.get("/refresh").then((res) => setAuthorizationHeader(res.data));
+};
+
 const token = localStorage.FBIdToken;
 if (token) {
-  const decodedToken = jwtDecode(token);
-  if (decodedToken.exp * 1000 < Date.now()) {
-    store.dispatch(logoutUser());
-    window.location.href = "/login";
-  } else {
-    store.dispatch({ type: SET_AUTHENTICATED });
-    axios.defaults.headers.common["Authorization"] = token;
-    store.dispatch(getUserData());
-  }
+  store.dispatch({ type: SET_AUTHENTICATED });
+  axios.defaults.headers.common["Authorization"] = token;
+  store.dispatch(getUserData());
 }
-
 function App() {
+  useEffect(() => {
+    if (token)
+      setTimeout(() => {
+        refreshToken();
+      }, 1000);
+  }, []);
+
   return (
     <MuiThemeProvider theme={theme}>
       <Provider store={store}>

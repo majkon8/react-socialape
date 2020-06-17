@@ -86,6 +86,7 @@ export class Notifications extends Component {
               icon = (
                 <ReplyIcon color={iconColor} style={{ marginRight: 10 }} />
               );
+              break;
             default:
               break;
           }

@@ -17,13 +17,10 @@ import LinkIcon from "@material-ui/icons/Link";
 import CalendarToday from "@material-ui/icons/CalendarToday";
 // Redux
 import { connect } from "react-redux";
-import { logoutUser } from "../../redux/actions/userActions";
 
-const styles = theme => ({ ...theme.spreadThis });
+const styles = (theme) => ({ ...theme.spreadThis });
 
 export class Profile extends Component {
-  handleLogout = () => this.props.logoutUser();
-
   render() {
     const {
       classes,
@@ -37,10 +34,10 @@ export class Profile extends Component {
           location,
           followers,
           following,
-          nickname
+          nickname,
         },
-        loading
-      }
+        loading,
+      },
     } = this.props;
     let profileMarkup = !loading ? (
       <Paper className={classes.paper}>
@@ -92,7 +89,7 @@ export class Profile extends Component {
                   style={{
                     marginRight: 20,
                     color: "unset",
-                    textDecoration: "none"
+                    textDecoration: "none",
                   }}
                 >
                   <span className="follow-number">
@@ -128,14 +125,11 @@ export class Profile extends Component {
   }
 }
 
-const mapStateToProps = state => ({ user: state.user });
+const mapStateToProps = (state) => ({ user: state.user });
 
 Profile.propTypes = {
   user: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
-  logoutUser: PropTypes.func.isRequired
 };
 
-export default connect(mapStateToProps, { logoutUser })(
-  withStyles(styles)(Profile)
-);
+export default connect(mapStateToProps, null)(withStyles(styles)(Profile));

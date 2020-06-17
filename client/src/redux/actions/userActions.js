@@ -21,7 +21,7 @@ export const loginUser = (userData) => (dispatch) => {
   axios
     .post("/login", userData)
     .then((res) => {
-      setAuthorizationHeader(res.data.token);
+      setAuthorizationHeader(res.data);
       dispatch(getUserData());
       dispatch(clearErrors());
       window.location.href = "/";
@@ -70,7 +70,7 @@ export const uploadUserImage = (formData) => (dispatch) => {
     .post("/user/image", formData)
     .then(() => dispatch(getUserData()))
     .catch((err) => {
-      dispatch({type: STOP_LOADING_USER})
+      dispatch({ type: STOP_LOADING_USER });
       console.log(err);
     });
 };
@@ -141,7 +141,7 @@ export const sendPasswordResetEmail = (email) => (dispatch) => {
 };
 
 // Set auth header
-const setAuthorizationHeader = (token) => {
+export const setAuthorizationHeader = (token) => {
   const FBIdToken = `Bearer ${token}`;
   localStorage.setItem("FBIdToken", FBIdToken);
   axios.defaults.headers.common["Authorization"] = FBIdToken;

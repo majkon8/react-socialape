@@ -28,6 +28,7 @@ const {
   searchForUser,
   changePassword,
   sendPasswordResetEmail,
+  refreshToken,
 } = require("./handlers/users");
 const {
   handleCreateNotificationOnLike,
@@ -44,7 +45,7 @@ const {
   handleCreateNotificationOnReply,
   handleDeleteNotificationOnUnreply,
 } = require("./dbtriggers");
-const FBAuth = require("./util/fbAuth");
+const FBAuth = require("./middleware/fbAuth");
 const cors = require("cors");
 
 app.use(cors());
@@ -66,6 +67,7 @@ app.post("/scream/reply", FBAuth, replyToScream);
 
 // USERS ROUTES
 
+app.get("/refresh", refreshToken);
 app.post("/signup", signup);
 app.post("/login", login);
 app.post("/user/image", FBAuth, uploadUserImage);

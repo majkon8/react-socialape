@@ -9,6 +9,18 @@ const {
 } = require("../util/validators");
 firebase.initializeApp(config);
 
+// Refresh token
+exports.refreshToken = async (req, res) => {
+  try {
+    const user = firebase.auth().currentUser;
+    const token = await user.getIdToken(true);
+    return res.json(token);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.code });
+  }
+};
+
 // User sign up
 exports.signup = (req, res) => {
   const newUser = {
@@ -31,12 +43,6 @@ exports.signup = (req, res) => {
     })
     .then((data) => {
       userId = data.user.uid;
-      return admin.auth().createCustomToken(userId);
-    })
-    .then((customToken) => {
-      return firebase.auth().signInWithCustomToken(customToken);
-    })
-    .then((data) => {
       return data.user.getIdToken();
     })
     .then((idToken) => {
@@ -63,23 +69,24 @@ exports.signup = (req, res) => {
 };
 
 // User log in
-exports.login = (req, res) => {
-  const user = {
-    ...req.body,
-  };
-  const { valid, errors } = validateLoginData(user);
-  if (!valid) return res.status(400).json(errors);
-  firebase
-    .auth()
-    .signInWithEmailAndPassword(user.email, user.password)
-    .then((data) => data.user.getIdToken())
-    .then((token) => res.json({ token }))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(403)
-        .json({ general: "Wrong credentials, please try again" });
-    });
+exports.login = async (req, res) => {
+  try {
+    const user = {
+      ...req.body,
+    };
+    const { valid, errors } = validateLoginData(user);
+    if (!valid) return res.status(400).json(errors);
+    const data = await firebase
+      .auth()
+      .signInWithEmailAndPassword(user.email, user.password);
+    const token = await data.user.getIdToken();
+    return res.json(token);
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(403)
+      .json({ general: "Wrong credentials, please try again" });
+  }
 };
 
 // Add user details

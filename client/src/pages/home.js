@@ -9,7 +9,7 @@ import Grid from "@material-ui/core/Grid";
 import { connect } from "react-redux";
 import { getScreams } from "../redux/actions/dataActions";
 
-const styles = theme => ({ ...theme.spreadThis });
+const styles = (theme) => ({ ...theme.spreadThis });
 
 export class home extends Component {
   componentDidMount() {
@@ -34,10 +34,10 @@ export class home extends Component {
 home.propTypes = {
   getScreams: PropTypes.func.isRequired,
   data: PropTypes.object.isRequired,
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = state => ({ data: state.data });
+const mapStateToProps = (state) => ({ data: state.data });
 
 export default connect(mapStateToProps, { getScreams })(
   withStyles(styles)(home)
