@@ -11,8 +11,8 @@ firebase.initializeApp(config);
 
 // Refresh token
 exports.refreshToken = async (req, res) => {
+  const user = firebase.auth().currentUser;
   try {
-    const user = firebase.auth().currentUser;
     const token = await user.getIdToken(true);
     return res.json({ token });
   } catch (err) {
@@ -23,13 +23,13 @@ exports.refreshToken = async (req, res) => {
 
 // User sign up
 exports.signup = async (req, res) => {
+  const newUser = {
+    ...req.body,
+  };
+  const { valid, errors } = validateSignupData(newUser);
+  if (!valid) return res.status(400).json(errors);
+  const noImg = "no-image.png";
   try {
-    const newUser = {
-      ...req.body,
-    };
-    const { valid, errors } = validateSignupData(newUser);
-    if (!valid) return res.status(400).json(errors);
-    const noImg = "no-image.png";
     const doc = await db.doc(`/users/${newUser.handle}`).get();
     if (doc.exists)
       return res.status(400).json({ handle: "This handle is already taken" });
@@ -65,12 +65,12 @@ exports.signup = async (req, res) => {
 
 // User log in
 exports.login = async (req, res) => {
+  const user = {
+    ...req.body,
+  };
+  const { valid, errors } = validateLoginData(user);
+  if (!valid) return res.status(400).json(errors);
   try {
-    const user = {
-      ...req.body,
-    };
-    const { valid, errors } = validateLoginData(user);
-    if (!valid) return res.status(400).json(errors);
     const data = await firebase
       .auth()
       .signInWithEmailAndPassword(user.email, user.password);
@@ -87,88 +87,75 @@ exports.login = async (req, res) => {
   }
 };
 
-// Add user details
-exports.addUserDetails = (req, res) => {
+// change user details
+exports.changeUserDetails = async (req, res) => {
   let userDetails = reduceUserDetails(req.body);
-  db.doc(`/users/${req.user.handle}`)
-    .update(userDetails)
-    .then(() => res.json({ message: "Details added successfully" }))
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({ error: err.code });
-    });
+  try {
+    await db.doc(`/users/${req.user.handle}`).update(userDetails);
+    return res.json({ message: "Details added successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.code });
+  }
 };
 
 // Get any user's details
-exports.getUserDetails = (req, res) => {
+exports.getUserDetails = async (req, res) => {
   let userData = {};
-  db.doc(`/users/${req.params.handle}`)
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        userData.user = doc.data();
-        return db
-          .collection("screams")
-          .where("userHandle", "==", req.params.handle)
-          .orderBy("createdAt", "desc")
-          .get();
-      }
-      return res.json(404).json({ error: "User not found" });
-    })
-    .then((data) => {
-      userData.screams = [];
-      data.forEach((doc) =>
-        userData.screams.push({
-          ...doc.data(),
-          screamId: doc.id,
-        })
-      );
-      return res.json(userData);
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({ error: err.code });
-    });
+  try {
+    const doc = await db.doc(`/users/${req.params.handle}`).get();
+    if (!doc.exists) return res.json(404).json({ error: "User not found" });
+    userData.user = doc.data();
+    const data = await db
+      .collection("screams")
+      .where("userHandle", "==", req.params.handle)
+      .orderBy("createdAt", "desc")
+      .get();
+    userData.screams = [];
+    data.forEach((doc) =>
+      userData.screams.push({
+        ...doc.data(),
+        screamId: doc.id,
+      })
+    );
+    return res.json(userData);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.code });
+  }
 };
 
 // Get own user details
-exports.getAuthenticatedUser = (req, res) => {
+exports.getAuthenticatedUser = async (req, res) => {
   let userData = {};
-  db.doc(`/users/${req.user.handle}`)
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        userData.credentials = doc.data();
-        return db
-          .collection("likes")
-          .where("userHandle", "==", req.user.handle)
-          .get();
-      }
-    })
-    .then((data) => {
-      userData.likes = [];
-      data.forEach((doc) => userData.likes.push(doc.data()));
-      return db
-        .collection("notifications")
-        .where("recipient", "==", req.user.handle)
-        .orderBy("createdAt", "desc")
-        .limit(100)
-        .get();
-    })
-    .then((data) => {
-      userData.notifications = [];
-      data.forEach((doc) =>
-        userData.notifications.push({
-          ...doc.data(),
-          notificationId: doc.id,
-        })
-      );
-      return res.json(userData);
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({ error: err.code });
-    });
+  try {
+    const doc = await db.doc(`/users/${req.user.handle}`).get();
+    if (!doc.exists) return res.json(404).json({ error: "User not found" });
+    userData.credentials = doc.data();
+    let data = await db
+      .collection("likes")
+      .where("userHandle", "==", req.user.handle)
+      .get();
+    userData.likes = [];
+    data.forEach((doc) => userData.likes.push(doc.data()));
+    data = await db
+      .collection("notifications")
+      .where("recipient", "==", req.user.handle)
+      .orderBy("createdAt", "desc")
+      .limit(100)
+      .get();
+    userData.notifications = [];
+    data.forEach((doc) =>
+      userData.notifications.push({
+        ...doc.data(),
+        notificationId: doc.id,
+      })
+    );
+    return res.json(userData);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.code });
+  }
 };
 
 // Upload user image
@@ -191,216 +178,190 @@ exports.uploadUserImage = (req, res) => {
     imageToBeUploaded = { filepath, mimetype };
     file.pipe(fs.createWriteStream(filepath));
   });
-  busboy.on("finish", () => {
-    admin
-      .storage()
-      .bucket(config.storageBucket)
-      .upload(imageToBeUploaded.filepath, {
-        resumable: false,
-        metadata: {
+  busboy.on("finish", async () => {
+    try {
+      await admin
+        .storage()
+        .bucket(config.storageBucket)
+        .upload(imageToBeUploaded.filepath, {
+          resumable: false,
           metadata: {
-            contentType: imageToBeUploaded.mimetype,
+            metadata: {
+              contentType: imageToBeUploaded.mimetype,
+            },
           },
-        },
-      })
-      .then(() => {
-        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
-        return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
-      })
-      .then(() => res.json({ message: "Image uploaded successfully" }))
-      .catch((err) => {
-        console.error(err);
-        return res.status(500).json({ error: err.code });
-      });
+        });
+
+      const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
+      await db.doc(`/users/${req.user.handle}`).update({ imageUrl });
+      res.json({ message: "Image uploaded successfully" });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    }
   });
   busboy.end(req.rawBody);
 };
 
 // Mark notifications read
-exports.markNotificationsRead = (req, res) => {
+exports.markNotificationsRead = async (req, res) => {
   const batch = db.batch();
   req.body.forEach((notificationId) => {
     const notification = db.doc(`/notifications/${notificationId}`);
     batch.update(notification, { read: true });
   });
-  batch
-    .commit()
-    .then(() => res.json({ message: "Notifications marked read" }))
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({ error: err.code });
-    });
+  try {
+    await batch.commit();
+    return res.json({ message: "Notifications marked read" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.code });
+  }
 };
 
 // Follow a user
-exports.follow = (req, res) => {
+exports.follow = async (req, res) => {
   const userHandle = req.user.handle;
   const userToFollow = req.params.handle;
   const userToFollowDoc = db.doc(`/users/${userToFollow}`);
   const userDocument = db.doc(`/users/${userHandle}`);
-  let userData;
   if (userToFollow === userHandle)
     return res.status(400).json({ error: "Cannot follow the user" });
-  userToFollowDoc
-    .get()
-    .then((doc) => {
-      if (!doc.exists) return res.status(404).json({ error: "User not found" });
-      else {
-        const userToFollowData = doc.data();
-        if (userToFollowData.followers.includes(userHandle))
-          return res.json(400).json({ error: "User already followed" });
-        userToFollowData.followers.push(userHandle);
-        return userToFollowDoc.update({
-          followers: [...userToFollowData.followers],
-        });
-      }
-    })
-    .then(() => userDocument.get())
-    .then((doc) => {
-      userData = doc.data();
-      userData.following.push(userToFollow);
-      return userDocument.update({ following: [...userData.following] });
-    })
-    .then(() => res.json(userData))
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: err.code });
-    });
+  try {
+    let doc = await userToFollowDoc.get();
+    if (!doc.exists) return res.status(404).json({ error: "User not found" });
+    else {
+      const userToFollowData = doc.data();
+      if (userToFollowData.followers.includes(userHandle))
+        return res.json(400).json({ error: "User already followed" });
+      userToFollowData.followers.push(userHandle);
+      await userToFollowDoc.update({
+        followers: [...userToFollowData.followers],
+      });
+    }
+    doc = await userDocument.get();
+    const userData = doc.data();
+    userData.following.push(userToFollow);
+    await userDocument.update({ following: [...userData.following] });
+    return res.json(userData);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.code });
+  }
 };
 
 // Unfollow a user
-exports.unfollow = (req, res) => {
+exports.unfollow = async (req, res) => {
   const userHandle = req.user.handle;
   const userToUnfollow = req.params.handle;
   const userToUnfollowDoc = db.doc(`/users/${userToUnfollow}`);
   const userDocument = db.doc(`/users/${userHandle}`);
-  let userData;
-  userToUnfollowDoc
-    .get()
-    .then((doc) => {
-      if (!doc.exists) return res.status(404).json({ error: "User not found" });
-      else {
-        const userToUnfollowData = doc.data();
-        if (!userToUnfollowData.followers.includes(userHandle))
-          return res.status(400).json({ error: "User not followed" });
-        userToUnfollowData.followers = userToUnfollowData.followers.filter(
-          (handle) => handle !== userHandle
-        );
-        return userToUnfollowDoc.update({
-          followers: [...userToUnfollowData.followers],
-        });
-      }
-    })
-    .then(() => userDocument.get())
-    .then((doc) => {
-      userData = doc.data();
-      userData.following = userData.following.filter(
-        (handle) => handle !== userToUnfollow
+  try {
+    let doc = await userToUnfollowDoc.get();
+    if (!doc.exists) return res.status(404).json({ error: "User not found" });
+    else {
+      const userToUnfollowData = doc.data();
+      if (!userToUnfollowData.followers.includes(userHandle))
+        return res.status(400).json({ error: "User not followed" });
+      userToUnfollowData.followers = userToUnfollowData.followers.filter(
+        (handle) => handle !== userHandle
       );
-      return userDocument.update({ following: [...userData.following] });
-    })
-    .then(() => res.json(userData))
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: err.code });
-    });
+      await userToUnfollowDoc.update({
+        followers: [...userToUnfollowData.followers],
+      });
+    }
+    doc = await userDocument.get();
+    const userData = doc.data();
+    userData.following = userData.following.filter(
+      (handle) => handle !== userToUnfollow
+    );
+    await userDocument.update({ following: [...userData.following] });
+    return res.json(userData);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.code });
+  }
 };
 
 // Get followers detais
-exports.getFollowUsersDetails = (req, res, type) => {
+exports.getFollowUsersDetails = async (req, res, type) => {
   const userHandle = req.params.handle;
   const userDocument = db.doc(`/users/${userHandle}`);
-  let followUsersHandles;
   let followUsersDetails = [];
-  userDocument
-    .get()
-    .then((doc) => {
-      if (!doc.exists) return res.status(404).json({ error: "User not found" });
-      followUsersHandles =
-        type === "followers" ? doc.data().followers : doc.data().following;
-      if (followUsersHandles.length === 0) return res.json([]);
-      return db
-        .collection("users")
-        .where("handle", "in", followUsersHandles)
-        .get();
-    })
-    .then((data) => {
-      data.forEach((doc) => followUsersDetails.push(doc.data()));
-      res.json(followUsersDetails);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: err.code });
-    });
+  try {
+    const doc = await userDocument.get();
+    if (!doc.exists) return res.status(404).json({ error: "User not found" });
+    const followUsersHandles =
+      type === "followers" ? doc.data().followers : doc.data().following;
+    if (followUsersHandles.length === 0) return res.json([]);
+    const data = await db
+      .collection("users")
+      .where("handle", "in", followUsersHandles)
+      .get();
+    data.forEach((doc) => followUsersDetails.push(doc.data()));
+    return res.json(followUsersDetails);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.code });
+  }
 };
 
 // Search for a user by name
-exports.searchForUser = (req, res) => {
+exports.searchForUser = async (req, res) => {
   const nameToSearch = req.params.name.toLowerCase();
   const searchedUsers = [];
-  db.collection("users")
-    .get()
-    .then((data) => {
-      data.forEach((doc) => {
-        if (
-          doc.data().handle.toLowerCase().includes(nameToSearch) ||
-          doc.data().nickname.toLowerCase().includes(nameToSearch)
-        )
-          searchedUsers.push(doc.data());
-      });
-      res.json(searchedUsers);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: err.code });
+  try {
+    const data = await db.collection("users").get();
+    data.forEach((doc) => {
+      if (
+        doc.data().handle.toLowerCase().includes(nameToSearch) ||
+        doc.data().nickname.toLowerCase().includes(nameToSearch)
+      )
+        searchedUsers.push(doc.data());
     });
+    return res.json(searchedUsers);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.code });
+  }
 };
 
 // Change user's password
-exports.changePassword = (req, res) => {
+exports.changePassword = async (req, res) => {
   const user = firebase.auth().currentUser;
   const { oldPassword, newPassword } = req.body;
   const credentials = firebase.auth.EmailAuthProvider.credential(
     user.email,
     oldPassword
   );
-  user
-    .reauthenticateWithCredential(credentials)
-    .then(() => {
-      const { valid, errors } = validatePasswordChangeData(req.body);
-      if (!valid) return res.status(400).json(errors);
-      user
-        .updatePassword(newPassword)
-        .then(() => res.status(200).json({ success: "success" }));
-    })
-    .catch((err) => {
-      console.error(err);
-      if (err.code === "auth/wrong-password")
-        return res.status(400).json({ password: "Wrong password" });
-      return res
-        .status(500)
-        .json({ general: "Something went wrong, please try again" });
-    });
+  try {
+    await user.reauthenticateWithCredential(credentials);
+    const { valid, errors } = validatePasswordChangeData(req.body);
+    if (!valid) return res.status(400).json(errors);
+    await user.updatePassword(newPassword);
+    return res.status(200).json({ success: "success" });
+  } catch (err) {
+    console.error(err);
+    if (err.code === "auth/wrong-password")
+      return res.status(400).json({ password: "Wrong password" });
+    return res
+      .status(500)
+      .json({ general: "Something went wrong, please try again" });
+  }
 };
 
 // Send password reset email
-exports.sendPasswordResetEmail = (req, res) => {
+exports.sendPasswordResetEmail = async (req, res) => {
   const email = req.body.email;
-  db.collection("users")
-    .where("email", "==", email)
-    .get()
-    .then(() =>
-      firebase
-        .auth()
-        .sendPasswordResetEmail(email)
-        .then(() => res.status(200).json({ success: "success" }))
-    )
-    .catch((err) => {
-      console.error(err);
-      if (err.code === "auth/user-not-found")
-        return res.status(400).json({ email: "User not found" });
-      return res
-        .status(500)
-        .json({ general: "Something went wrong, please try again" });
-    });
+  try {
+    await firebase.auth().sendPasswordResetEmail(email);
+    return res.status(200).json({ success: "success" });
+  } catch (err) {
+    console.error(err);
+    if (err.code === "auth/user-not-found")
+      return res.status(400).json({ email: "User not found" });
+    return res
+      .status(500)
+      .json({ general: "Something went wrong, please try again" });
+  }
 };

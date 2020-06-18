@@ -136,7 +136,7 @@ class PostScream extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    refreshToken()
+    refreshToken();
     const { body, tags, imageUrl } = this.state;
     const { replyScreamData } = this.props;
     replyScreamData

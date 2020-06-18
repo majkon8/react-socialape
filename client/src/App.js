@@ -38,10 +38,11 @@ const token = localStorage.FBIdToken;
 if (token) {
   const decodedToken = jwtDecode(token);
   if (decodedToken.exp * 1000 < Date.now()) {
-    const userEmail = localStorage.userEmail;
-    const userPassword = localStorage.userPassword;
+    const email = localStorage.userEmail;
+    const password = localStorage.userPassword;
     if (localStorage.userEmail && localStorage.userPassword) {
-      loginUser({ userEmail, userPassword });
+      const userData = { email, password };
+      store.dispatch(loginUser(userData));
     } else {
       store.dispatch(logoutUser());
       window.location.href = "/login";
@@ -60,7 +61,7 @@ function App() {
     if (token)
       setTimeout(() => {
         refreshToken();
-      }, 1000);
+      }, 2000);
   }, [location]);
 
   return (

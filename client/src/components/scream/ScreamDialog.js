@@ -54,6 +54,7 @@ export class ScreamDialog extends Component {
   };
 
   handleClose = () => {
+    if (this.props.UI.loading) return;
     window.history.pushState(null, null, this.state.oldPath);
     this.setState({ open: false });
     this.props.clearErrors();
@@ -181,16 +182,17 @@ export class ScreamDialog extends Component {
           fullWidth
           maxWidth="sm"
         >
-          <Link to={`/users/${scream.userHandle}`}>
-            <MyButton
-              tip="Close"
-              onClick={this.handleClose}
-              tipClassName={classes.closeButton}
-            >
-              <CloseIcon />
-            </MyButton>
-          </Link>
-
+          {!loading && (
+            <Link to={`/users/${scream.userHandle}`}>
+              <MyButton
+                tip="Close"
+                onClick={this.handleClose}
+                tipClassName={classes.closeButton}
+              >
+                <CloseIcon />
+              </MyButton>
+            </Link>
+          )}
           <DialogContent className={classes.dialogContent}>
             {dialogMarkup}
           </DialogContent>
