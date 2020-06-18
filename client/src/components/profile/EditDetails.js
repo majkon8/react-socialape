@@ -116,7 +116,7 @@ export class EditDetails extends Component {
       newPasswordFormIsOpen,
     } = this.state;
     const charactersLeftMarkup = (
-      <div style={{ float: "right" }}>
+      bio && <div style={{ float: "right" }}>
         Characters left:{" "}
         <span style={{ color: bio.length === 80 ? "red" : "green" }}>
           {80 - bio.length}

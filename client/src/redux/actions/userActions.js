@@ -37,7 +37,7 @@ export const signupUser = (newUserData) => (dispatch) => {
   axios
     .post("/signup", newUserData)
     .then((res) => {
-      setAuthorizationHeader(res.data.token);
+      setAuthorizationHeader(res.data);
       dispatch(getUserData());
       dispatch({ type: CLEAR_ERRORS });
       window.location.href = "/";
@@ -141,8 +141,14 @@ export const sendPasswordResetEmail = (email) => (dispatch) => {
 };
 
 // Set auth header
-export const setAuthorizationHeader = (token) => {
-  const FBIdToken = `Bearer ${token}`;
+export const setAuthorizationHeader = (userCredentials) => {
+  const FBIdToken = `Bearer ${userCredentials.token}`;
+  const userEmail = userCredentials.email;
+  const userPassword = userCredentials.password;
   localStorage.setItem("FBIdToken", FBIdToken);
+  if (userEmail && userPassword) {
+    localStorage.setItem("userEmail", userEmail);
+    localStorage.setItem("userPassword", userPassword);
+  }
   axios.defaults.headers.common["Authorization"] = FBIdToken;
 };

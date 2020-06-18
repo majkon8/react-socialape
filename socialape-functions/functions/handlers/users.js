@@ -14,7 +14,7 @@ exports.refreshToken = async (req, res) => {
   try {
     const user = firebase.auth().currentUser;
     const token = await user.getIdToken(true);
-    return res.json(token);
+    return res.json({ token });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: err.code });
@@ -22,50 +22,45 @@ exports.refreshToken = async (req, res) => {
 };
 
 // User sign up
-exports.signup = (req, res) => {
-  const newUser = {
-    ...req.body,
-  };
-  const { valid, errors } = validateSignupData(newUser);
-  if (!valid) return res.status(400).json(errors);
-  const noImg = "no-image.png";
-  let token, userId;
-  db.doc(`/users/${newUser.handle}`)
-    .get()
-    .then((doc) => {
-      if (doc.exists)
-        return res.status(400).json({ handle: "This handle is already taken" });
-      else {
-        return firebase
-          .auth()
-          .createUserWithEmailAndPassword(newUser.email, newUser.password);
-      }
-    })
-    .then((data) => {
-      userId = data.user.uid;
-      return data.user.getIdToken();
-    })
-    .then((idToken) => {
-      token = idToken;
-      const userCredentials = {
-        ...newUser,
-        createdAt: new Date().toISOString(),
-        userId,
-        imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`,
-        followers: [],
-        following: [],
-      };
-      return db.doc(`/users/${newUser.handle}`).set(userCredentials);
-    })
-    .then(() => res.status(201).json({ token }))
-    .catch((err) => {
-      console.error(err);
-      if (err.code === "auth/email-already-in-use")
-        return res.status(400).json({ email: "Email is already in use" });
-      return res
-        .status(500)
-        .json({ general: "Something went wrong, please try again" });
-    });
+exports.signup = async (req, res) => {
+  try {
+    const newUser = {
+      ...req.body,
+    };
+    const { valid, errors } = validateSignupData(newUser);
+    if (!valid) return res.status(400).json(errors);
+    const noImg = "no-image.png";
+    const doc = await db.doc(`/users/${newUser.handle}`).get();
+    if (doc.exists)
+      return res.status(400).json({ handle: "This handle is already taken" });
+    const data = await firebase
+      .auth()
+      .createUserWithEmailAndPassword(newUser.email, newUser.password);
+    await firebase
+      .auth()
+      .signInWithEmailAndPassword(newUser.email, newUser.password);
+    const userId = data.user.uid;
+    const token = await data.user.getIdToken();
+    const userCredentials = {
+      ...newUser,
+      createdAt: new Date().toISOString(),
+      userId,
+      imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`,
+      followers: [],
+      following: [],
+    };
+    await db.doc(`/users/${newUser.handle}`).set(userCredentials);
+    const email = newUser.email;
+    const password = newUser.password;
+    return res.status(201).json({ token, email, password });
+  } catch (err) {
+    console.error(err);
+    if (err.code === "auth/email-already-in-use")
+      return res.status(400).json({ email: "Email is already in use" });
+    return res
+      .status(500)
+      .json({ general: "Something went wrong, please try again" });
+  }
 };
 
 // User log in
@@ -80,7 +75,10 @@ exports.login = async (req, res) => {
       .auth()
       .signInWithEmailAndPassword(user.email, user.password);
     const token = await data.user.getIdToken();
-    return res.json(token);
+    const email = user.email;
+    const password = user.password;
+    const userCredentials = { token, email, password };
+    return res.json(userCredentials);
   } catch (err) {
     console.error(err);
     return res
