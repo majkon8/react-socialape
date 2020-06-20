@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -21,123 +21,115 @@ import ReplyIcon from "@material-ui/icons/Reply";
 import { connect } from "react-redux";
 import { markNotificationsRead } from "../../redux/actions/userActions";
 
-export class Notifications extends Component {
-  state = { anchorEl: null };
+function Notifications({ notifications, markNotificationsRead }) {
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  handleOpen = (event) => this.setState({ anchorEl: event.target });
+  const handleOpen = (event) => setAnchorEl(event.target);
 
-  handleClose = () => this.setState({ anchorEl: null });
+  const handleClose = () => setAnchorEl(null);
 
-  onMenuOpened = () => {
-    let unreadNotificationsIds = this.props.notifications
+  const onMenuOpened = () => {
+    let unreadNotificationsIds = notifications
       .filter((not) => !not.read)
       .map((not) => not.notificationId);
-    this.props.markNotificationsRead(unreadNotificationsIds);
+    markNotificationsRead(unreadNotificationsIds);
   };
 
-  render() {
-    const { notifications } = this.props;
-    const { anchorEl } = this.state;
-    dayjs.extend(relativeTime);
-    let notificationIcon;
-    if (notifications && notifications.length > 0) {
-      const notificationsNum = notifications.filter((not) => not.read === false)
-        .length;
-      notificationsNum > 0
-        ? (notificationIcon = (
-            <Badge badgeContent={notificationsNum} max={999} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          ))
-        : (notificationIcon = <NotificationsIcon />);
-    } else notificationIcon = <NotificationsIcon />;
-    let notificationsMarkup =
-      notifications && notifications.length > 0 ? (
-        notifications.map((not) => {
-          let verb;
-          let icon;
-          const iconColor = not.read ? "primary" : "secondary";
-          const time = dayjs(not.createdAt).fromNow();
-          switch (not.type) {
-            case "like":
-              verb = "liked";
-              icon = (
-                <FavoriteIcon color={iconColor} style={{ marginRight: 10 }} />
-              );
-              break;
-            case "comment":
-              verb = "commented on";
-              icon = <ChatIcon color={iconColor} style={{ marginRight: 10 }} />;
-              break;
-            case "follow":
-              verb = "followed";
-              icon = (
-                <PersonAddIcon color={iconColor} style={{ marginRight: 10 }} />
-              );
-              break;
-            case "share":
-              verb = "shared";
-              icon = (
-                <ShareIcon color={iconColor} style={{ marginRight: 10 }} />
-              );
-              break;
-            case "reply":
-              verb = "replied";
-              icon = (
-                <ReplyIcon color={iconColor} style={{ marginRight: 10 }} />
-              );
-              break;
-            default:
-              break;
-          }
-          return (
-            <MenuItem key={not.createdAt} onClick={this.handleClose}>
-              {icon}
-              <Typography
-                component={Link}
-                variant="body1"
-                to={
-                  not.type === "follow"
-                    ? `/users/${not.sender}`
-                    : not.type === "share" || not.type === "reply"
-                    ? `/users/${not.sender}/scream/${not.screamId}`
-                    : `/users/${not.recipient}/scream/${not.screamId}`
-                }
-              >
-                {not.type === "follow"
-                  ? `${not.sender} ${verb} you ${time}`
-                  : `${not.sender} ${verb} your scream ${time}`}
-              </Typography>
-            </MenuItem>
-          );
-        })
-      ) : (
-        <MenuItem onClick={this.handleClose}>
-          You have no notifications yet
-        </MenuItem>
-      );
+  dayjs.extend(relativeTime);
+
+  let notificationIcon;
+
+  if (notifications && notifications.length > 0) {
+    const notificationsNum = notifications.filter((not) => not.read === false)
+      .length;
+    notificationsNum > 0
+      ? (notificationIcon = (
+          <Badge badgeContent={notificationsNum} max={999} color="secondary">
+            <NotificationsIcon />
+          </Badge>
+        ))
+      : (notificationIcon = <NotificationsIcon />);
+  } else notificationIcon = <NotificationsIcon />;
+
+  const makeNotification = (not) => {
+    let verb;
+    let icon;
+    const iconColor = not.read ? "primary" : "secondary";
+    const time = dayjs(not.createdAt).fromNow();
+    switch (not.type) {
+      case "like":
+        verb = "liked";
+        icon = <FavoriteIcon color={iconColor} style={{ marginRight: 10 }} />;
+        break;
+      case "comment":
+        verb = "commented on";
+        icon = <ChatIcon color={iconColor} style={{ marginRight: 10 }} />;
+        break;
+      case "follow":
+        verb = "followed";
+        icon = <PersonAddIcon color={iconColor} style={{ marginRight: 10 }} />;
+        break;
+      case "share":
+        verb = "shared";
+        icon = <ShareIcon color={iconColor} style={{ marginRight: 10 }} />;
+        break;
+      case "reply":
+        verb = "replied";
+        icon = <ReplyIcon color={iconColor} style={{ marginRight: 10 }} />;
+        break;
+      default:
+        break;
+    }
     return (
-      <>
-        <Tooltip placement="top" title="Notifications">
-          <IconButton
-            aria-owns={anchorEl ? "simple-menu" : undefined}
-            aria-haspopup="true"
-            onClick={this.handleOpen}
-          >
-            {notificationIcon}
-          </IconButton>
-        </Tooltip>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={this.handleClose}
-          onExit={this.onMenuOpened}
+      <MenuItem key={not.createdAt} onClick={handleClose}>
+        {icon}
+        <Typography
+          component={Link}
+          variant="body1"
+          to={
+            not.type === "follow"
+              ? `/users/${not.sender}`
+              : not.type === "share" || not.type === "reply"
+              ? `/users/${not.sender}/scream/${not.screamId}`
+              : `/users/${not.recipient}/scream/${not.screamId}`
+          }
         >
-          {notificationsMarkup}
-        </Menu>
-      </>
+          {not.type === "follow"
+            ? `${not.sender} ${verb} you ${time}`
+            : `${not.sender} ${verb} your scream ${time}`}
+        </Typography>
+      </MenuItem>
     );
-  }
+  };
+
+  const notificationsMarkup =
+    notifications && notifications.length > 0 ? (
+      notifications.map((not) => makeNotification(not))
+    ) : (
+      <MenuItem onClick={handleClose}>You have no notifications yet</MenuItem>
+    );
+
+  return (
+    <>
+      <Tooltip placement="top" title="Notifications">
+        <IconButton
+          aria-owns={anchorEl ? "simple-menu" : undefined}
+          aria-haspopup="true"
+          onClick={handleOpen}
+        >
+          {notificationIcon}
+        </IconButton>
+      </Tooltip>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        onExit={onMenuOpened}
+      >
+        {notificationsMarkup}
+      </Menu>
+    </>
+  );
 }
 
 Notifications.propTypes = {

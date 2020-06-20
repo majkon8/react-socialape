@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import { Link } from "react-router-dom";
@@ -10,38 +10,37 @@ import Typography from "@material-ui/core/Typography";
 // Redux
 import { connect } from "react-redux";
 
-const styles = theme => ({
+const styles = (theme) => ({
   ...theme.spreadThis,
   commentImage: {
     maxWidth: "100%",
     height: 100,
     objectFit: "cover",
-    borderRadius: "50%"
+    borderRadius: "50%",
   },
-  commentData: { position: "relative", marginLeft: 20 }
+  commentData: { position: "relative", marginLeft: 20 },
 });
 
-export class Comments extends Component {
-  render() {
-    const {
-      comments,
-      classes,
-      user: {
-        authenticated,
-        credentials: { handle }
-      },
-      data: { scream }
-    } = this.props;
-    return (
-      <Grid container>
-        {comments && comments.map((comment, index) => {
+function Comments({
+  comments,
+  classes,
+  user: {
+    authenticated,
+    credentials: { handle },
+  },
+  data: { scream },
+}) {
+  return (
+    <Grid container>
+      {comments &&
+        comments.map((comment, index) => {
           const {
             commentId,
             body,
             createdAt,
             userImage,
             userHandle,
-            userNickname
+            userNickname,
           } = comment;
           const deleteButton =
             authenticated && userHandle === handle ? (
@@ -84,17 +83,17 @@ export class Comments extends Component {
             </Fragment>
           );
         })}
-      </Grid>
-    );
-  }
+    </Grid>
+  );
 }
 
 Comments.propTypes = {
-  comments: PropTypes.array.isRequired,
+  comments: PropTypes.array,
   user: PropTypes.object.isRequired,
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = state => ({ user: state.user, data: state.data });
+const mapStateToProps = (state) => ({ user: state.user, data: state.data });
 
 export default connect(mapStateToProps)(withStyles(styles)(Comments));

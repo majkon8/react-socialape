@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import MyButton from "../util/MyButton";
 import Tag from "../util/Tag";
@@ -6,11 +6,8 @@ import axios from "axios";
 import { refreshToken } from "../../util";
 // Redux
 import { connect } from "react-redux";
-import {
-  postScream,
-  clearErrors,
-  replyToScream,
-} from "../../redux/actions/dataActions";
+import { postScream, replyToScream } from "../../redux/actions/dataActions";
+import { clearErrors } from "../../redux/actions/uiActions";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
 import Button from "@material-ui/core/Button";
@@ -36,262 +33,226 @@ const styles = (theme) => ({
   tagsContainer: { display: "flex", flexWrap: "wrap" },
 });
 
-class PostScream extends Component {
-  state = {
-    open: false,
-    body: "",
-    errors: {},
-    tags: [],
-    currentTag: "",
-    imageUrl: "",
-    loadingImage: false,
+function PostScream({
+  postScream,
+  replyToScream,
+  clearErrors,
+  UI,
+  classes,
+  replyScreamData,
+}) {
+  const [open, setOpen] = useState(false);
+  const [body, setBody] = useState("");
+  const [tags, setTags] = useState([]);
+  const [currentTag, setCurrentTag] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [loadingImage, setLoadingImage] = useState(false);
+  const imgInputRef = useRef();
+
+  useEffect(() => {
+    if (!UI.loading && !UI.errors) handleClose();
+  }, [UI.loading]);
+
+  const uploadScreamImage = async (formData) => {
+    setLoadingImage(true);
+    try {
+      const res = await axios.post("/scream/image", formData);
+      setImageUrl(res.data.imageUrl);
+    } finally {
+      setLoadingImage(false);
+    }
   };
 
-  imgInputRef = React.createRef();
+  const handleOpen = () => setOpen(true);
 
-  static getDerivedStateFromProps(nextProps) {
-    if (nextProps.UI.errors) return { errors: nextProps.UI.errors };
-    return { errors: {} };
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.UI.loading && !this.props.UI.loading && !this.props.UI.errors)
-      this.handleClose();
-  }
-
-  uploadScreamImage = (formData) => {
-    this.setState({ loadingImage: true });
-    axios
-      .post("/scream/image", formData)
-      .then((res) => this.setState({ imageUrl: res.data.imageUrl }))
-      .catch((err) => console.log(err))
-      .finally(() => this.setState({ loadingImage: false }));
+  const handleClose = () => {
+    clearErrors();
+    setOpen(false);
+    setBody("");
+    setTags([]);
+    setCurrentTag("");
+    handleImageRemove();
   };
 
-  handleOpen = () => this.setState({ open: true });
-
-  handleClose = () => {
-    this.props.clearErrors();
-    this.setState({
-      open: false,
-      body: "",
-      tags: [],
-      currentTag: "",
-    });
-    this.handleImageRemove();
-  };
-
-  handleChange = (event) => {
+  const handleChange = (event, state, setState) => {
     if (event.target.name === "body" && event.target.value.length > 280) return;
-    else if (
-      this.state[event.target.name] === "" &&
-      event.target.value.trim() === ""
-    )
-      return;
+    else if (state === "" && event.target.value.trim() === "") return;
     else if (
       event.target.name === "currentTag" &&
       (event.target.value.length > 12 ||
         /[^A-Za-z0-9]+/.test(event.target.value))
     )
       return;
-    else this.setState({ [event.target.name]: event.target.value });
+    else setState(event.target.value);
   };
 
-  handleTagAdd = () => {
-    const { tags, currentTag } = this.state;
+  const handleTagAdd = () => {
     if (
       tags.includes(currentTag) ||
       currentTag.length === 0 ||
       tags.length === 6
     )
       return;
-    this.setState((state) => ({
-      tags: [...state.tags, state.currentTag.trim().toLowerCase()],
-      currentTag: "",
-    }));
+    setTags([...tags, currentTag.trim().toLowerCase()]);
+    setCurrentTag("");
   };
 
-  handleTagRemove = (tagName) =>
-    this.setState((state) => {
-      const updatedTags = state.tags.filter((tag) => tag !== tagName);
-      return { tags: [...updatedTags] };
-    });
+  const handleTagRemove = (tagName) => {
+    const updatedTags = tags.filter((tag) => tag !== tagName);
+    setTags(updatedTags);
+  };
 
-  handleAddPicture = () => {
+  const handleAddPicture = () => {
     const fileInput = document.getElementById("imageInput");
     fileInput.click();
   };
 
-  handleImageAdd = (event) => {
+  const handleImageAdd = (event) => {
     const image = event.target.files[0];
     const formData = new FormData();
     formData.append("image", image, image.name);
-    this.uploadScreamImage(formData);
+    uploadScreamImage(formData);
   };
 
-  handleImageRemove = () => {
-    if (this.imgInputRef.current) this.imgInputRef.current.value = null;
-    this.setState({ imageUrl: "" });
+  const handleImageRemove = () => {
+    if (imgInputRef.current) imgInputRef.current.value = null;
+    setImageUrl("");
   };
 
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     refreshToken();
-    const { body, tags, imageUrl } = this.state;
-    const { replyScreamData } = this.props;
     replyScreamData
-      ? this.props.replyToScream({ body, tags, imageUrl, replyScreamData })
-      : this.props.postScream({ body, tags, imageUrl });
+      ? replyToScream({ body, tags, imageUrl, replyScreamData })
+      : postScream({ body, tags, imageUrl });
   };
 
-  render() {
-    const {
-      errors,
-      body,
-      currentTag,
-      tags,
-      imageUrl,
-      loadingImage,
-    } = this.state;
-    const {
-      classes,
-      UI: { loading },
-      replyScreamData,
-    } = this.props;
-    const charactersLeftMarkup = (
-      <div style={{ float: "right" }}>
-        Characters left:{" "}
-        <span style={{ color: body.length === 280 ? "red" : "green" }}>
-          {280 - body.length}
-        </span>
-      </div>
-    );
-    const icon = replyScreamData ? (
-      <MyButton onClick={this.handleOpen} tip="Reply">
-        <ReplyIcon color="primary" />
-      </MyButton>
-    ) : (
-      <MyButton onClick={this.handleOpen} tip="Post a Scream!">
-        <AddIcon />
-      </MyButton>
-    );
-    return (
-      <>
-        {icon}
-        <Dialog
-          open={this.state.open}
-          onClose={this.handleClose}
-          fullWidth
-          maxWidth="sm"
-        >
-          <MyButton
-            tip="Close"
-            onClick={this.handleClose}
-            tipClassName={classes.closeButton}
-          >
-            <CloseIcon />
-          </MyButton>
-          <DialogTitle>
-            {replyScreamData ? "Reply to scream" : "Post a new scream"}
-          </DialogTitle>
-          <DialogContent>
-            <form onSubmit={this.handleSubmit}>
-              <TextField
-                variant="outlined"
-                name="body"
-                type="text"
-                multiline
-                rows="5"
-                label="Scream content"
-                error={errors.body ? true : false}
-                helperText={errors.body}
-                className={classes.textField}
-                onChange={this.handleChange}
-                value={body}
-                fullWidth
-              />
-              {charactersLeftMarkup}
-              <TextField
-                variant="outlined"
-                name="currentTag"
-                type="text"
-                size="small"
-                label="Tag"
-                className={classes.tagInput}
-                onChange={this.handleChange}
-                value={currentTag}
-                error={errors.tag ? true : false}
-                helperText={errors.tag}
-              ></TextField>
-              <MyButton
-                onClick={this.handleTagAdd}
-                btnClassName={classes.addButton}
-                tip="Add tag (max 6)"
-              >
-                <AddIcon />
-              </MyButton>
-              <div className={classes.tagsContainer}>
-                {tags.map((tag) => (
-                  <Tag
-                    key={tag}
-                    tagName={tag}
-                    removeTag={this.handleTagRemove}
-                  />
-                ))}
-              </div>
-              <input
-                onChange={this.handleImageAdd}
-                type="file"
-                id="imageInput"
-                hidden="hidden"
-                ref={this.imgInputRef}
-              />
-              {!imageUrl && (
-                <MyButton
-                  style={{ marginBottom: 5 }}
-                  onClick={this.handleAddPicture}
-                  tip="Add image"
-                >
-                  <ImageIcon
-                    style={{ color: loadingImage ? "transparent" : "#d84315" }}
-                  />
+  const charactersLeftMarkup = (
+    <div style={{ float: "right" }}>
+      Characters left:{" "}
+      <span style={{ color: body.length === 280 ? "red" : "green" }}>
+        {280 - body.length}
+      </span>
+    </div>
+  );
 
-                  {loadingImage && (
-                    <CircularProgress size={30} className={classes.progress} />
-                  )}
-                </MyButton>
-              )}
-              {imageUrl && (
-                <Tooltip title="Click to remove image">
-                  <img
-                    onClick={this.handleImageRemove}
-                    className={classes.imgPreview}
-                    src={imageUrl}
-                    alt="Scream image"
-                  />
-                </Tooltip>
-              )}
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                className={classes.submitButton}
-                disabled={loading || body.trim() === ""}
+  const icon = replyScreamData ? (
+    <MyButton onClick={handleOpen} tip="Reply">
+      <ReplyIcon color="primary" />
+    </MyButton>
+  ) : (
+    <MyButton onClick={handleOpen} tip="Post a Scream!">
+      <AddIcon />
+    </MyButton>
+  );
+
+  return (
+    <>
+      {icon}
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+        <MyButton
+          tip="Close"
+          onClick={handleClose}
+          tipClassName={classes.closeButton}
+        >
+          <CloseIcon />
+        </MyButton>
+        <DialogTitle>
+          {replyScreamData ? "Reply to scream" : "Post a new scream"}
+        </DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              variant="outlined"
+              name="body"
+              type="text"
+              multiline
+              rows="5"
+              label="Scream content"
+              error={UI.errors && UI.errors.body ? true : false}
+              helperText={UI.errors && UI.errors.body}
+              className={classes.textField}
+              onChange={(e) => handleChange(e, body, setBody)}
+              value={body}
+              fullWidth
+            />
+            {charactersLeftMarkup}
+            <TextField
+              variant="outlined"
+              name="currentTag"
+              type="text"
+              size="small"
+              label="Tag"
+              className={classes.tagInput}
+              onChange={(e) => handleChange(e, currentTag, setCurrentTag)}
+              value={currentTag}
+              error={UI.errors && UI.errors.tag ? true : false}
+              helperText={UI.errors && UI.errors.tag}
+            ></TextField>
+            <MyButton
+              onClick={handleTagAdd}
+              btnClassName={classes.addButton}
+              tip="Add tag (max 6)"
+            >
+              <AddIcon />
+            </MyButton>
+            <div className={classes.tagsContainer}>
+              {tags.map((tag) => (
+                <Tag key={tag} tagName={tag} removeTag={handleTagRemove} />
+              ))}
+            </div>
+            <input
+              onChange={handleImageAdd}
+              type="file"
+              id="imageInput"
+              hidden="hidden"
+              ref={imgInputRef}
+            />
+            {!imageUrl && (
+              <MyButton
+                style={{ marginBottom: 5 }}
+                onClick={handleAddPicture}
+                tip="Add image"
               >
-                Submit
-                {loading && (
-                  <CircularProgress
-                    size={30}
-                    className={classes.progressSpinner}
-                  />
+                <ImageIcon
+                  style={{ color: loadingImage ? "transparent" : "#d84315" }}
+                />
+
+                {loadingImage && (
+                  <CircularProgress size={30} className={classes.progress} />
                 )}
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }
+              </MyButton>
+            )}
+            {imageUrl && (
+              <Tooltip title="Click to remove image">
+                <img
+                  onClick={handleImageRemove}
+                  className={classes.imgPreview}
+                  src={imageUrl}
+                  alt="Scream image"
+                />
+              </Tooltip>
+            )}
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              className={classes.submitButton}
+              disabled={UI.loading || body.trim() === ""}
+            >
+              Submit
+              {UI.loading && (
+                <CircularProgress
+                  size={30}
+                  className={classes.progressSpinner}
+                />
+              )}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
 
 PostScream.propTypes = {

@@ -13,131 +13,131 @@ import {
   STOP_LOADING_USER,
 } from "../types";
 import axios from "axios";
-import { clearErrors } from "./dataActions";
+import { clearErrors, clearSuccesses } from "./uiActions";
 
 // Login
-export const loginUser = (userData) => (dispatch) => {
+export const loginUser = (userData) => async (dispatch) => {
   dispatch({ type: LOADING_UI });
-  axios
-    .post("/login", userData)
-    .then((res) => {
-      setAuthorizationHeader(res.data);
-      dispatch(getUserData());
-      dispatch(clearErrors());
-      window.location.href = "/";
-    })
-    .catch((err) => {
-      dispatch({ type: SET_ERRORS, payload: err.response.data });
-    });
+  try {
+    const res = await axios.post("/login", userData);
+    setAuthorizationHeader(res.data);
+    dispatch(getUserData());
+    dispatch(clearErrors());
+    dispatch(clearSuccesses());
+    window.location.href = "/";
+  } catch (err) {
+    dispatch({ type: SET_ERRORS, payload: err.response.data });
+  }
 };
 
 // Signup
-export const signupUser = (newUserData) => (dispatch) => {
+export const signupUser = (newUserData) => async (dispatch) => {
   dispatch({ type: LOADING_UI });
-  axios
-    .post("/signup", newUserData)
-    .then((res) => {
-      setAuthorizationHeader(res.data);
-      dispatch(getUserData());
-      dispatch({ type: CLEAR_ERRORS });
-      window.location.href = "/";
-    })
-    .catch((err) => dispatch({ type: SET_ERRORS, payload: err.response.data }));
-};
-
-// Logout
-export const logoutUser = () => (dispatch) => {
-  localStorage.removeItem("FBIdToken");
-  delete axios.defaults.headers.common["Authorization"];
-  dispatch({ type: SET_UNAUTHENTICATED });
+  try {
+    const res = await axios.post("/signup", newUserData);
+    setAuthorizationHeader(res.data);
+    dispatch(getUserData());
+    dispatch({ type: CLEAR_ERRORS });
+    window.location.href = "/";
+  } catch (err) {
+    dispatch({ type: SET_ERRORS, payload: err.response.data });
+  }
 };
 
 // Get logged in user data
-export const getUserData = () => (dispatch) => {
+export const getUserData = () => async (dispatch) => {
   dispatch({ type: LOADING_USER });
-  axios
-    .get("/user")
-    .then((res) => {
-      dispatch({ type: SET_USER, payload: res.data });
-    })
-    .catch((err) => console.log(err));
+  try {
+    const res = await axios.get("/user");
+    dispatch({ type: SET_USER, payload: res.data });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 // Upload an image
-export const uploadUserImage = (formData) => (dispatch) => {
+export const uploadUserImage = (formData) => async (dispatch) => {
   dispatch({ type: LOADING_USER });
-  axios
-    .post("/user/image", formData)
-    .then(() => dispatch(getUserData()))
-    .catch((err) => {
-      dispatch({ type: STOP_LOADING_USER });
-      console.log(err);
-    });
+  try {
+    await axios.post("/user/image", formData);
+    dispatch(getUserData());
+  } catch (err) {
+    dispatch({ type: STOP_LOADING_USER });
+    console.log(err);
+  }
 };
 
 // Edit user details
-export const editUserDetails = (userDetails) => (dispatch) => {
+export const editUserDetails = (userDetails) => async (dispatch) => {
   dispatch({ type: LOADING_USER });
-  axios
-    .post("/user", userDetails)
-    .then(() => dispatch(getUserData()))
-    .catch((err) => console.log(err));
+  try {
+    await axios.post("/user", userDetails);
+    dispatch(getUserData());
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 // Mark notifications read
-export const markNotificationsRead = (notificationIds) => (dispatch) =>
-  axios
-    .post("/notifications", notificationIds)
-    .then(() => dispatch({ type: MARK_NOTIFICATIONS_READ }))
-    .catch((err) => console.log(err));
+export const markNotificationsRead = (notificationIds) => async (dispatch) => {
+  try {
+    await axios.post("/notifications", notificationIds);
+    dispatch({ type: MARK_NOTIFICATIONS_READ });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 // Follow profile
-export const follow = (userHandle) => (dispatch) =>
-  axios
-    .post(`/user/${userHandle}/follow`)
-    .then((res) => dispatch({ type: FOLLOW, payload: res.data }))
-    .catch((err) => console.log(err));
+export const follow = (userHandle) => async (dispatch) => {
+  try {
+    const res = await axios.post(`/user/${userHandle}/follow`);
+    dispatch({ type: FOLLOW, payload: res.data });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 // Unfollow profile
-export const unfollow = (userHandle) => (dispatch) =>
-  axios
-    .post(`/user/${userHandle}/unfollow`)
-    .then((res) => dispatch({ type: UNFOLLOW, payload: res.data }))
-    .catch((err) => console.log(err));
+export const unfollow = (userHandle) => async (dispatch) => {
+  try {
+    const res = await axios.post(`/user/${userHandle}/unfollow`);
+    dispatch({ type: UNFOLLOW, payload: res.data });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 // Change user's password
-export const changePassword = (credentials) => (dispatch) =>
-  axios
-    .post("user/password", credentials)
-    .then(() => {
-      dispatch({
-        type: SET_SUCCESSES,
-        payload: { success: "Password changed" },
-      });
-      dispatch({ type: CLEAR_ERRORS });
-    })
-    .catch((err) => {
-      dispatch({ type: SET_ERRORS, payload: err.response.data });
-      dispatch({ type: CLEAR_SUCCESSES });
+export const changePassword = (credentials) => async (dispatch) => {
+  dispatch({ type: LOADING_UI });
+  try {
+    await axios.post("user/password", credentials);
+    dispatch({
+      type: SET_SUCCESSES,
+      payload: { success: "Password changed" },
     });
+    dispatch({ type: CLEAR_ERRORS });
+  } catch (err) {
+    dispatch({ type: SET_ERRORS, payload: err.response.data });
+    dispatch({ type: CLEAR_SUCCESSES });
+  }
+};
 
 // Send password reset email
-export const sendPasswordResetEmail = (email) => (dispatch) => {
+export const sendPasswordResetEmail = (email) => async (dispatch) => {
   dispatch({ type: LOADING_UI });
-  axios
-    .post("user/forgot", email)
-    .then(() => {
-      dispatch({
-        type: SET_SUCCESSES,
-        payload: { success: "Check your email to reset password" },
-      });
-      dispatch({ type: CLEAR_ERRORS });
-    })
-    .catch((err) => {
-      console.log(err.response.data);
-      dispatch({ type: SET_ERRORS, payload: err.response.data });
-      dispatch({ type: CLEAR_SUCCESSES });
+  try {
+    await axios.post("user/forgot", email);
+    dispatch({
+      type: SET_SUCCESSES,
+      payload: { success: "Check your email to reset password" },
     });
+    dispatch({ type: CLEAR_ERRORS });
+  } catch (err) {
+    dispatch({ type: SET_ERRORS, payload: err.response.data });
+    dispatch({ type: CLEAR_SUCCESSES });
+  }
 };
 
 // Set auth header
@@ -151,4 +151,11 @@ export const setAuthorizationHeader = (userCredentials) => {
     localStorage.setItem("userPassword", userPassword);
   }
   axios.defaults.headers.common["Authorization"] = FBIdToken;
+};
+
+// Logout
+export const logoutUser = () => (dispatch) => {
+  localStorage.removeItem("FBIdToken");
+  delete axios.defaults.headers.common["Authorization"];
+  dispatch({ type: SET_UNAUTHENTICATED });
 };

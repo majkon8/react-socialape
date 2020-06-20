@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import MyButton from "./MyButton";
@@ -12,80 +12,73 @@ import IconButton from "@material-ui/core/IconButton";
 // Redux
 import { connect } from "react-redux";
 
-const styles = theme => ({
+const styles = (theme) => ({
   ...theme.spreadThis,
   root: {
     padding: "1px 4px",
     display: "flex",
     alignItems: "center",
-    width: 300
+    width: 300,
   },
   input: { marginLeft: theme.spacing(1), flex: 1 },
   iconButton: { padding: 10 },
-  divider: { height: 28, margin: 4 }
+  divider: { height: 28, margin: 4 },
 });
 
-export class Search extends Component {
-  state = { inputValue: "" };
-  searchRef = React.createRef();
+function Search({ classes, isToggledSearchForUsers }) {
+  const [inputValue, setInputValue] = useState("");
+  const searchRef = useRef();
 
-  handleChange = event => this.setState({ inputValue: event.target.value });
+  const handleChange = (event) => setInputValue(event.target.value);
 
-  handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    if (this.state.inputValue.length < 3) return;
-    this.searchRef.current.click();
+    if (inputValue.length < 3) return;
+    searchRef.current.click();
   };
 
-  render() {
-    const { classes, isToggledSearchForUsers } = this.props;
-    const { inputValue } = this.state;
-    const searchButton =
-      inputValue.length > 2 ? (
-        <Link
-          ref={this.searchRef}
-          to={
-            isToggledSearchForUsers
-              ? `/users/search/${inputValue}`
-              : `/screams/search/${inputValue}`
-          }
-        >
-          <MyButton btnClassName={classes.iconButton} tip="Search">
-            <SearchIcon style={{ color: "#d84315" }} />
-          </MyButton>
-        </Link>
-      ) : (
-        <IconButton className={classes.iconButton} disabled={true}>
-          <SearchIcon style={{ color: "grey" }} />
-        </IconButton>
-      );
-    return (
-      <Paper
-        onSubmit={this.handleSubmit}
-        component="form"
-        className={classes.root}
+  const searchButton =
+    inputValue.length > 2 ? (
+      <Link
+        ref={searchRef}
+        to={
+          isToggledSearchForUsers
+            ? `/users/search/${inputValue}`
+            : `/screams/search/${inputValue}`
+        }
       >
-        <InputBase
-          className={classes.input}
-          placeholder="Search SocialApe"
-          inputProps={{ className: classes.input }}
-          value={inputValue}
-          onChange={this.handleChange}
-        />
-        <Divider className={classes.divider} orientation="vertical" />
-        {searchButton}
-      </Paper>
+        <MyButton btnClassName={classes.iconButton} tip="Search">
+          <SearchIcon style={{ color: "#d84315" }} />
+        </MyButton>
+      </Link>
+    ) : (
+      <IconButton className={classes.iconButton} disabled={true}>
+        <SearchIcon style={{ color: "grey" }} />
+      </IconButton>
     );
-  }
+
+  return (
+    <Paper onSubmit={handleSubmit} component="form" className={classes.root}>
+      <InputBase
+        className={classes.input}
+        placeholder="Search SocialApe"
+        inputProps={{ className: classes.input }}
+        value={inputValue}
+        onChange={handleChange}
+      />
+      <Divider className={classes.divider} orientation="vertical" />
+      {searchButton}
+    </Paper>
+  );
 }
 
 Search.propTypes = {
   classes: PropTypes.object.isRequired,
-  isToggledSearchForUsers: PropTypes.bool.isRequired
+  isToggledSearchForUsers: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
-  isToggledSearchForUsers: state.UI.isToggledSearchForUsers
+const mapStateToProps = (state) => ({
+  isToggledSearchForUsers: state.UI.isToggledSearchForUsers,
 });
 
 export default connect(mapStateToProps)(withStyles(styles)(Search));

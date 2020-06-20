@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
 import PropTypes from "prop-types";
 import AppIcon from "../images/icon.png";
@@ -15,98 +15,85 @@ import { loginUser } from "../redux/actions/userActions";
 
 const styles = (theme) => ({ ...theme.spreadThis });
 
-export class login extends Component {
-  state = { email: "", password: "", errors: {} };
+function Login({ classes, loginUser, UI: { loading, errors } }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  static getDerivedStateFromProps(nextProps) {
-    if (nextProps.UI.errors) return { errors: nextProps.UI.errors };
-    return null;
-  }
+  const handleChange = (event, setState) => setState(event.target.value);
 
-  handleChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
-  };
-
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    const userData = { email: this.state.email, password: this.state.password };
-    this.props.loginUser(userData);
+    const userData = { email, password };
+    loginUser(userData);
   };
 
-  render() {
-    const {
-      classes,
-      UI: { loading },
-    } = this.props;
-    const { errors } = this.state;
-    return (
-      <Grid container className={classes.form}>
-        <Grid item sm />
-        <Grid item sm>
-          <img src={AppIcon} alt="monkey" className={classes.image} />
-          <Typography variant="h2" className={classes.pageTitle}>
+  return (
+    <Grid container className={classes.form}>
+      <Grid item sm />
+      <Grid item sm>
+        <img src={AppIcon} alt="monkey" className={classes.image} />
+        <Typography variant="h2" className={classes.pageTitle}>
+          Login
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            id="email"
+            name="email"
+            type="email"
+            label="Email"
+            className={classes.textField}
+            helperText={errors && errors.email}
+            error={errors && errors.email ? true : false}
+            value={email}
+            onChange={(e) => handleChange(e, setEmail)}
+            fullWidth
+          />
+          <TextField
+            id="password"
+            name="password"
+            type="password"
+            label="Password"
+            className={classes.textField}
+            helperText={errors && errors.password}
+            error={errors && errors.password ? true : false}
+            value={password}
+            onChange={(e) => handleChange(e, setPassword)}
+            fullWidth
+          />
+          {errors && errors.general && (
+            <Typography variant="body2" className={classes.customError}>
+              {errors.general}
+            </Typography>
+          )}
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            disabled={loading}
+          >
             Login
-          </Typography>
-          <form onSubmit={this.handleSubmit}>
-            <TextField
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              className={classes.textField}
-              helperText={errors.email}
-              error={errors.email ? true : false}
-              value={this.state.email}
-              onChange={this.handleChange}
-              fullWidth
-            />
-            <TextField
-              id="password"
-              name="password"
-              type="password"
-              label="Password"
-              className={classes.textField}
-              helperText={errors.password}
-              error={errors.password ? true : false}
-              value={this.state.password}
-              onChange={this.handleChange}
-              fullWidth
-            />
-            {errors.general && (
-              <Typography variant="body2" className={classes.customError}>
-                {errors.general}
-              </Typography>
+            {loading && (
+              <CircularProgress size={30} className={classes.progress} />
             )}
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              disabled={loading}
-            >
-              Login
-              {loading && (
-                <CircularProgress size={30} className={classes.progress} />
-              )}
-            </Button>
-            <br />
-            <br />
-            <small>
-              Don't have an account? Signup <Link to="/signup">here</Link>
-            </small>
-            <br />
-            <small>
-              Forgot your password? Click <Link to="/forgot">here</Link>
-            </small>
-          </form>
-        </Grid>
-        <Grid item sm />
+          </Button>
+          <br />
+          <br />
+          <small>
+            Don't have an account? Signup <Link to="/signup">here</Link>
+          </small>
+          <br />
+          <small>
+            Forgot your password? Click <Link to="/forgot">here</Link>
+          </small>
+        </form>
       </Grid>
-    );
-  }
+      <Grid item sm />
+    </Grid>
+  );
 }
 
-login.propTypes = {
+Login.propTypes = {
   classes: PropTypes.object.isRequired,
   loginUser: PropTypes.func.isRequired,
   UI: PropTypes.object.isRequired,
@@ -118,4 +105,4 @@ const mapActionsToProps = { loginUser };
 export default connect(
   mapStateToProps,
   mapActionsToProps
-)(withStyles(styles)(login));
+)(withStyles(styles)(Login));

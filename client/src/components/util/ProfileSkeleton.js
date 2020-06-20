@@ -9,25 +9,23 @@ import LocationOn from "@material-ui/icons/LocationOn";
 import LinkIcon from "@material-ui/icons/Link";
 import CalendarToday from "@material-ui/icons/CalendarToday";
 
-const styles = theme => ({
+const styles = (theme) => ({
   ...theme.spreadThis,
   handle: {
     height: 20,
     backgroundColor: theme.palette.primary.main,
     width: 100,
-    margin: "0 auto 7px auto"
+    margin: "0 auto 7px auto",
   },
   fullLine: {
     height: 15,
     backgroundColor: "rgba(0, 0, 0, 0.6)",
     width: "100%",
-    marginBottom: 10
-  }
+    marginBottom: 10,
+  },
 });
 
-const ProfileSkeleton = props => {
-  const { classes } = props;
-
+function ProfileSkeleton({ classes }) {
   return (
     <Paper className={classes.paper}>
       <div className={classes.profile}>
@@ -50,7 +48,7 @@ const ProfileSkeleton = props => {
       </div>
     </Paper>
   );
-};
+}
 
 ProfileSkeleton.propTypes = { classes: PropTypes.object.isRequired };
 

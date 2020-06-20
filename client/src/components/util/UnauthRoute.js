@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 const UnauthRoute = ({ component: Component, authenticated, ...rest }) => (
   <Route
     {...rest}
-    render={props =>
+    render={(props) =>
       !authenticated === true ? (
         <Redirect to="/login" />
       ) : (
@@ -16,7 +16,9 @@ const UnauthRoute = ({ component: Component, authenticated, ...rest }) => (
   />
 );
 
-const mapStateToProps = state => ({ authenticated: state.user.authenticated });
+const mapStateToProps = (state) => ({
+  authenticated: state.user.authenticated,
+});
 
 UnauthRoute.propTypes = { authenticated: PropTypes.bool.isRequired };
 

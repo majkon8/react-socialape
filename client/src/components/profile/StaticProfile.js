@@ -18,7 +18,7 @@ import CalendarToday from "@material-ui/icons/CalendarToday";
 import { connect } from "react-redux";
 import { setProfile } from "../../redux/actions/dataActions";
 
-const styles = theme => ({ ...theme.spreadThis });
+const styles = (theme) => ({ ...theme.spreadThis });
 
 function usePrevious(value) {
   const ref = useRef();
@@ -28,7 +28,7 @@ function usePrevious(value) {
   return ref.current;
 }
 
-const StaticProfile = ({
+function StaticProfile({
   setProfile,
   classes,
   profile,
@@ -41,10 +41,10 @@ const StaticProfile = ({
     location,
     followers,
     following,
-    nickname
+    nickname,
   },
-  user: { credentials }
-}) => {
+  user: { credentials },
+}) {
   const prevCredentials = usePrevious(credentials);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const StaticProfile = ({
       prevCredentials.following.length > credentials.following.length
     ) {
       const updatedFollowers = [...followers].filter(
-        handle => handle !== credentials.handle
+        (handle) => handle !== credentials.handle
       );
       setProfile({ ...profile, followers: [...updatedFollowers] });
     }
@@ -116,7 +116,7 @@ const StaticProfile = ({
                 style={{
                   marginRight: 20,
                   color: "unset",
-                  textDecoration: "none"
+                  textDecoration: "none",
                 }}
               >
                 <span className="follow-number">
@@ -147,15 +147,15 @@ const StaticProfile = ({
       </div>
     </Paper>
   );
-};
+}
 
 StaticProfile.propTypes = {
   profile: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
-  setProfile: PropTypes.func.isRequired
+  setProfile: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({ user: state.user });
+const mapStateToProps = (state) => ({ user: state.user });
 
 export default connect(mapStateToProps, { setProfile })(
   withStyles(styles)(StaticProfile)

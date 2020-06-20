@@ -6,13 +6,15 @@ import PropTypes from "prop-types";
 const AuthRoute = ({ component: Component, authenticated, ...rest }) => (
   <Route
     {...rest}
-    render={props =>
+    render={(props) =>
       authenticated ? <Redirect to="/" /> : <Component {...props} />
     }
   />
 );
 
-const mapStateToProps = state => ({ authenticated: state.user.authenticated });
+const mapStateToProps = (state) => ({
+  authenticated: state.user.authenticated,
+});
 
 AuthRoute.propTypes = { authenticated: PropTypes.bool.isRequired };
 

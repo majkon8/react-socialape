@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import ProfilesDisplay from "../components/util/ProfilesDisplay";
 // Redux
@@ -6,60 +6,40 @@ import { connect } from "react-redux";
 import {
   getFollowUsers,
   setFollowers,
-  setFollowing
+  setFollowing,
 } from "../redux/actions/dataActions";
 
-export class follows extends Component {
-  state = { type: "" };
+function Follows({ match, getFollowUsers, setFollowers, setFollowing, data }) {
+  const [type, setType] = useState("");
 
-  componentDidMount() {
-    const handle = this.props.match.params.handle;
-    let type;
-    if (this.props.match.path.includes("followers")) type = "followers";
-    else if (this.props.match.path.includes("following")) type = "following";
-    this.setState({ type });
-    this.props.getFollowUsers(handle, type);
-  }
+  useEffect(() => {
+    const handle = match.params.handle;
+    let currentType;
+    if (match.path.includes("followers")) currentType = "followers";
+    else if (match.path.includes("following")) currentType = "following";
+    setType(currentType);
+    getFollowUsers(handle, currentType);
+    return () => {
+      setFollowers(null);
+      setFollowing(null);
+    };
+  }, [match.params.handle]);
 
-  componentDidUpdate(prevProps) {
-    const prevHandle = prevProps.match.params.handle;
-    const handle = this.props.match.params.handle;
-    let type;
-    if (this.props.match.path.includes("followers")) type = "followers";
-    else if (this.props.match.path.includes("following")) type = "following";
-    if (handle !== prevHandle) {
-      this.props.getFollowUsers(handle, type);
-      this.setState({ type });
-    }
-  }
+  const usersToDisplay =
+    type === "followers" ? data.followersDetails : data.followingUsersDetails;
 
-  componentWillUnmount() {
-    setFollowers(null);
-    setFollowing(null);
-  }
-
-  render() {
-    const {
-      followersDetails,
-      followingUsersDetails,
-      loading
-    } = this.props.data;
-    const { type } = this.state;
-    const usersToDisplay =
-      type === "followers" ? followersDetails : followingUsersDetails;
-    return <ProfilesDisplay users={usersToDisplay} loading={loading} />;
-  }
+  return <ProfilesDisplay users={usersToDisplay} loading={data.loading} />;
 }
 
-follows.propTypes = {
-  getFollowUsers: PropTypes.func.isRequired,
+Follows.propTypes = {
+  setFollowUsers: PropTypes.func.isRequired,
   setFollowers: PropTypes.func.isRequired,
   setFollowing: PropTypes.func.isRequired,
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = state => ({ data: state.data });
+const mapStateToProps = (state) => ({ data: state.data });
 
 const mapActionsToProps = { getFollowUsers, setFollowers, setFollowing };
 
-export default connect(mapStateToProps, mapActionsToProps)(follows);
+export default connect(mapStateToProps, mapActionsToProps)(Follows);

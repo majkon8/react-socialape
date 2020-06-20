@@ -16,7 +16,7 @@ const breakpointColumnsObj = {
   550: 1,
 };
 
-const ProfilesDisplay = ({ users, loading, classes }) => {
+function ProfilesDisplay({ users, loading, classes }) {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const ProfilesDisplay = ({ users, loading, classes }) => {
       </Masonry>
     );
   return profilesMarkup;
-};
+}
 
 ProfilesDisplay.propTypes = {
   classes: PropTypes.object.isRequired,

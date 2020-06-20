@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Switch, Redirect, useLocation } from "react-router-dom";
 import "./App.css";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
@@ -21,13 +21,13 @@ import Navbar from "./components/layout/Navbar";
 import AuthRoute from "./components/util/AuthRoute";
 import UnauthRoute from "./components/util/UnauthRoute";
 // Pages
-import home from "./pages/home";
-import login from "./pages/login";
-import signup from "./pages/signup";
-import user from "./pages/user";
-import follows from "./pages/follows";
-import search from "./pages/search";
-import forgotPassword from "./pages/forgotPassword";
+import Home from "./pages/home";
+import Login from "./pages/login";
+import Signup from "./pages/signup";
+import User from "./pages/user";
+import Follows from "./pages/follows";
+import Search from "./pages/search";
+import ForgotPassword from "./pages/forgotPassword";
 
 const theme = createMuiTheme(themeFile);
 
@@ -57,7 +57,7 @@ if (token) {
 function App() {
   const location = useLocation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (token)
       setTimeout(() => {
         refreshToken();
@@ -70,27 +70,27 @@ function App() {
         <Navbar></Navbar>
         <div className="container">
           <Switch>
-            <UnauthRoute exact path="/" component={home} />
-            <AuthRoute exact path="/login" component={login} />
-            <AuthRoute exact path="/signup" component={signup} />
-            <AuthRoute exact path="/forgot" component={forgotPassword} />
+            <UnauthRoute exact path="/" component={Home} />
+            <AuthRoute exact path="/login" component={Login} />
+            <AuthRoute exact path="/signup" component={Signup} />
+            <AuthRoute exact path="/forgot" component={ForgotPassword} />
             <UnauthRoute
               exact
               path="/users/:handle/followers"
-              component={follows}
+              component={Follows}
             />
             <UnauthRoute
               exact
               path="/users/:handle/following"
-              component={follows}
+              component={Follows}
             />
-            <UnauthRoute exact path="/users/search/:name" component={search} />
-            <UnauthRoute exact path="/screams/search/:tag" component={search} />
-            <Route exact path="/users/:handle" component={user} />
+            <UnauthRoute exact path="/users/search/:name" component={Search} />
+            <UnauthRoute exact path="/screams/search/:tag" component={Search} />
+            <Route exact path="/users/:handle" component={User} />
             <Route
               exact
               path="/users/:handle/scream/:screamId"
-              component={user}
+              component={User}
             />
             <Redirect from="*" to="/" />
           </Switch>

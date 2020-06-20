@@ -7,7 +7,7 @@ import { follow, unfollow } from "../../redux/actions/userActions";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Button from "@material-ui/core/Button";
 
-const styles = theme => ({
+const styles = (theme) => ({
   ...theme.spreadThis,
   followButton: {
     width: 200,
@@ -15,17 +15,17 @@ const styles = theme => ({
     marginRight: "auto",
     display: "block",
     fontWeight: "bold",
-    fontSize: 14
-  }
+    fontSize: 14,
+  },
 });
 
-const Follow = ({
+function Follow({
   follow,
   unfollow,
   classes,
   user: { credentials },
-  profile: { handle }
-}) => {
+  profile: { handle },
+}) {
   const handleFollow = () => follow(handle);
 
   const handleUnfollow = () => unfollow(handle);
@@ -51,16 +51,16 @@ const Follow = ({
     );
 
   return followButton;
-};
+}
 
 Follow.propTypes = {
   profile: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
   follow: PropTypes.func.isRequired,
-  unfollow: PropTypes.func.isRequired
+  unfollow: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({ user: state.user });
+const mapStateToProps = (state) => ({ user: state.user });
 
 const mapActionsToProps = { follow, unfollow };
 

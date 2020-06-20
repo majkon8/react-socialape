@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import MyButton from "../util/MyButton";
 // Redux
@@ -7,16 +7,14 @@ import { shareScream } from "../../redux/actions/dataActions";
 // Icons
 import ShareIcon from "@material-ui/icons/Share";
 
-export class ShareButton extends Component {
-  sharePost = () => this.props.shareScream(this.props.screamData);
+function ShareButton({ shareScream, screamData }) {
+  const handleShareScream = () => shareScream(screamData);
 
-  render() {
-    return (
-      <MyButton tip="Share" onClick={this.sharePost}>
-        <ShareIcon color="primary" />
-      </MyButton>
-    );
-  }
+  return (
+    <MyButton tip="Share" onClick={handleShareScream}>
+      <ShareIcon color="primary" />
+    </MyButton>
+  );
 }
 
 ShareButton.propTypes = {

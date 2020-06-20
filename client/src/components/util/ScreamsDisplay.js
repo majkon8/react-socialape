@@ -8,7 +8,7 @@ import Typography from "@material-ui/core/Typography";
 
 const styles = (theme) => ({ ...theme.spreadThis });
 
-const ScreamsDisplay = ({ loading, screams, classes }) => {
+function ScreamsDisplay({ loading, screams, classes }) {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const ScreamsDisplay = ({ loading, screams, classes }) => {
   );
 
   return screamsMarkup;
-};
+}
 
 ScreamsDisplay.propTypes = {
   classes: PropTypes.object.isRequired,

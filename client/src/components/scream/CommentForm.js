@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 // MUI
@@ -9,56 +9,54 @@ import TextField from "@material-ui/core/TextField";
 import { connect } from "react-redux";
 import { submitComment } from "../../redux/actions/dataActions";
 
-const styles = theme => ({ ...theme.spreadThis });
+const styles = (theme) => ({ ...theme.spreadThis });
 
-export class CommentForm extends Component {
-  state = { body: "", errors: {} };
+function CommentForm({
+  submitComment,
+  UI: { errors },
+  classes,
+  screamId,
+  authenticated,
+}) {
+  const [body, setBody] = useState("");
 
-  static getDerivedStateFromProps(nextProps) {
-    if (nextProps.UI.errors) return { errors: nextProps.UI.errors };
-    return { errors: {} };
-  }
+  const handleChange = (event) => setBody(event.target.value);
 
-  handleChange = event => this.setState({ body: event.target.value });
-
-  handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    this.props.submitComment(this.props.screamId, { body: this.state.body });
-    this.setState({ body: "" });
+    submitComment(screamId, { body });
+    setBody("");
   };
 
-  render() {
-    const { classes, authenticated } = this.props;
-    const errors = this.state.errors;
-    const commentFormMarkup = authenticated ? (
-      <Grid item sm={12} style={{ textAlign: "center" }}>
-        <form onSubmit={this.handleSubmit}>
-          <TextField
-            variant="outlined"
-            name="body"
-            type="text"
-            label="Comment on scream"
-            error={errors.comment ? true : false}
-            helperText={errors.comment}
-            value={this.state.body}
-            onChange={this.handleChange}
-            fullWidth
-            className={classes.textField}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            style={{ float: "right", marginBottom: 8 }}
-          >
-            Submit
-          </Button>
-        </form>
-        <hr className={classes.visibleSeparator} />
-      </Grid>
-    ) : null;
-    return commentFormMarkup;
-  }
+  const commentFormMarkup = authenticated ? (
+    <Grid item sm={12} style={{ textAlign: "center" }}>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          variant="outlined"
+          name="body"
+          type="text"
+          label="Comment on scream"
+          error={errors && errors.comment ? true : false}
+          helperText={errors && errors.comment}
+          value={body}
+          onChange={handleChange}
+          fullWidth
+          className={classes.textField}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          style={{ float: "right", marginBottom: 8 }}
+          disabled={body.length === 50}
+        >
+          Submit
+        </Button>
+      </form>
+      <hr className={classes.visibleSeparator} />
+    </Grid>
+  ) : null;
+  return commentFormMarkup;
 }
 
 CommentForm.propTypes = {
@@ -66,12 +64,12 @@ CommentForm.propTypes = {
   UI: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
   screamId: PropTypes.string.isRequired,
-  authenticated: PropTypes.bool.isRequired
+  authenticated: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   UI: state.UI,
-  authenticated: state.user.authenticated
+  authenticated: state.user.authenticated,
 });
 
 export default connect(mapStateToProps, { submitComment })(

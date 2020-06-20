@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import MyButton from "../util/MyButton";
 import NewPasswordForm from "./NewPasswordForm";
@@ -26,32 +26,31 @@ const styles = (theme) => ({
   button: { position: "absolute", zIndex: 1 },
 });
 
-export class EditDetails extends Component {
-  state = {
-    nickname: "",
-    bio: "",
-    website: "",
-    location: "",
-    open: false,
-    newPasswordFormIsOpen: false,
+function EditDetails({
+  editUserDetails,
+  classes,
+  uploadUserImage,
+  clearErrors,
+  clearSuccesses,
+  credentials,
+}) {
+  const [nickname, setNickname] = useState("");
+  const [bio, setBio] = useState("");
+  const [website, setWebsite] = useState("");
+  const [location, setLocation] = useState("");
+  const [open, setOpen] = useState(false);
+  const [newPasswordFormIsOpen, setNewPasswordFormIsOpen] = useState(false);
+
+  useEffect(() => mapUserDetailsToState(credentials), []);
+
+  const handleOpen = () => {
+    setOpen(true);
+    mapUserDetailsToState(credentials);
   };
 
-  componentDidMount() {
-    this.mapUserDetailsToState(this.props.credentials);
-  }
-
-  handleOpen = () => {
-    this.setState({ open: true });
-    this.mapUserDetailsToState(this.props.credentials);
-  };
-
-  handleChange = (event) => {
+  const handleChange = (event, state, setState) => {
     if (event.target.name === "bio" && event.target.value.length > 80) return;
-    if (
-      this.state[event.target.name] === "" &&
-      event.target.value.trim() === ""
-    )
-      return;
+    if (state === "" && event.target.value.trim() === "") return;
     if (
       (event.target.name === "website" || event.target.name === "location") &&
       event.target.value.length > 30
@@ -59,168 +58,148 @@ export class EditDetails extends Component {
       return;
     if (event.target.name === "nickname" && event.target.value.length > 20)
       return;
-    this.setState({ [event.target.name]: event.target.value });
+    setState(event.target.value);
   };
 
-  handleImageChange = (event) => {
+  const handleImageChange = (event) => {
     const image = event.target.files[0];
     const formData = new FormData();
     formData.append("image", image, image.name);
-    this.props.uploadUserImage(formData);
+    uploadUserImage(formData);
   };
 
-  handleEditPicture = () => {
+  const handleEditPicture = () => {
     const fileInput = document.getElementById("imageInput");
     fileInput.click();
   };
 
-  mapUserDetailsToState = (credentials) => {
-    this.setState({
-      bio: credentials.bio && credentials.bio,
-      website: credentials.website && credentials.website,
-      location: credentials.location && credentials.location,
-      nickname: credentials.nickname && credentials.nickname,
-    });
+  const mapUserDetailsToState = (credentials) => {
+    const { bio, website, location, nickname } = credentials;
+    bio && setBio(bio);
+    website && setWebsite(website);
+    location && setLocation(location);
+    nickname && setNickname(nickname);
   };
 
-  handleClose = () => {
-    this.setState({ open: false, newPasswordFormIsOpen: false });
-    this.props.clearErrors();
-    this.props.clearSuccesses();
+  const handleClose = () => {
+    setOpen(false);
+    setNewPasswordFormIsOpen(false);
+    clearErrors();
+    clearSuccesses();
   };
 
-  handleSubmit = () => {
-    const userDetails = {
-      bio: this.state.bio,
-      website: this.state.website,
-      location: this.state.location,
-      nickname: this.state.nickname,
-    };
-    this.props.editUserDetails(userDetails);
-    this.handleClose();
+  const handleSubmit = () => {
+    const userDetails = { bio, website, location, nickname };
+    editUserDetails(userDetails);
+    handleClose();
   };
 
-  togglePasswordForm = () =>
-    this.setState((state) => ({
-      newPasswordFormIsOpen: !state.newPasswordFormIsOpen,
-    }));
+  const togglePasswordForm = () =>
+    setNewPasswordFormIsOpen(!newPasswordFormIsOpen);
 
-  render() {
-    const { classes } = this.props;
-    const {
-      nickname,
-      bio,
-      website,
-      location,
-      open,
-      newPasswordFormIsOpen,
-    } = this.state;
-    const charactersLeftMarkup = (
-      bio && <div style={{ float: "right" }}>
-        Characters left:{" "}
-        <span style={{ color: bio.length === 80 ? "red" : "green" }}>
-          {80 - bio.length}
-        </span>
-      </div>
-    );
-    return (
-      <>
-        <MyButton
-          tip="Edit details"
-          onClick={this.handleOpen}
-          btnClassName={classes.button}
-        >
-          <EditIcon color="primary" />
-        </MyButton>
-        <Dialog open={open} onClose={this.handleClose} fullWidth maxWidth="sm">
-          <DialogTitle>Edit your details</DialogTitle>
-          <DialogContent>
-            <form>
-              <TextField
-                variant="outlined"
-                name="nickname"
-                type="text"
-                label="Nickname"
-                placeholder="Nickname"
-                className={classes.textField}
-                value={nickname}
-                onChange={this.handleChange}
-                fullWidth
-              />
-              <TextField
-                variant="outlined"
-                name="bio"
-                type="text"
-                label="Bio"
-                multiline
-                rows="3"
-                placeholder="A short bio about yourself"
-                className={classes.textField}
-                value={bio}
-                onChange={this.handleChange}
-                fullWidth
-              />
-              {charactersLeftMarkup}
-              <TextField
-                variant="outlined"
-                name="website"
-                type="text"
-                label="Website"
-                placeholder="Your personal/proffesional website"
-                className={classes.textField}
-                value={website}
-                onChange={this.handleChange}
-                fullWidth
-              />
-              <TextField
-                variant="outlined"
-                name="location"
-                type="text"
-                label="Location"
-                placeholder="Where you live"
-                className={classes.textField}
-                value={location}
-                onChange={this.handleChange}
-                fullWidth
-              />
-              <input
-                type="file"
-                id="imageInput"
-                hidden="hidden"
-                onChange={this.handleImageChange}
-              />
-              <MyButton
-                onClick={this.handleEditPicture}
-                tip="Edit profile image"
-              >
-                <ImageIcon color="primary" />
-              </MyButton>
-            </form>
-            <p
-              style={{
-                cursor: "pointer",
-                color: "#00bcd4",
-                marginBottom: 0,
-                marginTop: 7,
-              }}
-              onClick={this.togglePasswordForm}
-            >
-              Change password
-            </p>
-            {newPasswordFormIsOpen && <NewPasswordForm />}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={this.handleSubmit} color="primary">
-              Save
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
-    );
-  }
+  const charactersLeftMarkup = bio && (
+    <div style={{ float: "right" }}>
+      Characters left:{" "}
+      <span style={{ color: bio.length === 80 ? "red" : "green" }}>
+        {80 - bio.length}
+      </span>
+    </div>
+  );
+
+  return (
+    <>
+      <MyButton
+        tip="Edit details"
+        onClick={handleOpen}
+        btnClassName={classes.button}
+      >
+        <EditIcon color="primary" />
+      </MyButton>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+        <DialogTitle>Edit your details</DialogTitle>
+        <DialogContent>
+          <form>
+            <TextField
+              variant="outlined"
+              name="nickname"
+              type="text"
+              label="Nickname"
+              placeholder="Nickname"
+              className={classes.textField}
+              value={nickname}
+              onChange={(e) => handleChange(e, nickname, setNickname)}
+              fullWidth
+            />
+            <TextField
+              variant="outlined"
+              name="bio"
+              type="text"
+              label="Bio"
+              multiline
+              rows="3"
+              placeholder="A short bio about yourself"
+              className={classes.textField}
+              value={bio}
+              onChange={(e) => handleChange(e, bio, setBio)}
+              fullWidth
+            />
+            {charactersLeftMarkup}
+            <TextField
+              variant="outlined"
+              name="website"
+              type="text"
+              label="Website"
+              placeholder="Your personal/proffesional website"
+              className={classes.textField}
+              value={website}
+              onChange={(e) => handleChange(e, website, setWebsite)}
+              fullWidth
+            />
+            <TextField
+              variant="outlined"
+              name="location"
+              type="text"
+              label="Location"
+              placeholder="Where you live"
+              className={classes.textField}
+              value={location}
+              onChange={(e) => handleChange(e, location, setLocation)}
+              fullWidth
+            />
+            <input
+              type="file"
+              id="imageInput"
+              hidden="hidden"
+              onChange={handleImageChange}
+            />
+            <MyButton onClick={handleEditPicture} tip="Edit profile image">
+              <ImageIcon color="primary" />
+            </MyButton>
+          </form>
+          <p
+            style={{
+              cursor: "pointer",
+              color: "#00bcd4",
+              marginBottom: 0,
+              marginTop: 7,
+            }}
+            onClick={togglePasswordForm}
+          >
+            Change password
+          </p>
+          {newPasswordFormIsOpen && <NewPasswordForm />}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 }
 
 EditDetails.propTypes = {
@@ -229,6 +208,7 @@ EditDetails.propTypes = {
   uploadUserImage: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   clearSuccesses: PropTypes.func.isRequired,
+  credentials: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({ credentials: state.user.credentials });

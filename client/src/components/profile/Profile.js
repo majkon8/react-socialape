@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import { Link } from "react-router-dom";
@@ -20,109 +20,106 @@ import { connect } from "react-redux";
 
 const styles = (theme) => ({ ...theme.spreadThis });
 
-export class Profile extends Component {
-  render() {
-    const {
-      classes,
-      user: {
-        credentials: {
-          handle,
-          createdAt,
-          imageUrl,
-          bio,
-          website,
-          location,
-          followers,
-          following,
-          nickname,
-        },
-        loading,
-      },
-    } = this.props;
-    let profileMarkup = !loading ? (
-      <Paper className={classes.paper}>
-        <div className={classes.profile}>
-          <EditDetails />
-          <div className="image-wrapper">
-            <img src={imageUrl} className="profile-image" alt="profile" />
-          </div>
+function Profile({
+  classes,
+  user: {
+    credentials: {
+      handle,
+      createdAt,
+      imageUrl,
+      bio,
+      website,
+      location,
+      followers,
+      following,
+      nickname,
+    },
+    loading,
+  },
+}) {
+  const profileMarkup = !loading ? (
+    <Paper className={classes.paper}>
+      <div className={classes.profile}>
+        <EditDetails />
+        <div className="image-wrapper">
+          <img src={imageUrl} className="profile-image" alt="profile" />
+        </div>
+        <hr />
+        <div className="profile-handle">
+          <MuiLink
+            component={Link}
+            to={`/users/${handle}`}
+            color="primary"
+            variant="h5"
+          >
+            {nickname}
+          </MuiLink>
+        </div>
+        <hr />
+        <div className="profile-details">
+          {bio && <Typography variant="body2">{bio}</Typography>}
           <hr />
-          <div className="profile-handle">
-            <MuiLink
-              component={Link}
-              to={`/users/${handle}`}
-              color="primary"
-              variant="h5"
-            >
-              {nickname}
-            </MuiLink>
-          </div>
+          {location && (
+            <>
+              <LocationOn color="primary" />
+              <span>{location}</span>
+              <hr />
+            </>
+          )}
+          {website && (
+            <>
+              <LinkIcon color="primary" />
+              <a href={website} target="_blank" rel="noopener noreferrer">
+                {" "}
+                {website}
+              </a>
+              <hr />
+            </>
+          )}
+          <CalendarToday color="primary" />{" "}
+          <span>Joined {dayjs(createdAt).format("MMM YYYY")}</span>
           <hr />
-          <div className="profile-details">
-            {bio && <Typography variant="body2">{bio}</Typography>}
-            <hr />
-            {location && (
-              <>
-                <LocationOn color="primary" />
-                <span>{location}</span>
-                <hr />
-              </>
-            )}
-            {website && (
-              <>
-                <LinkIcon color="primary" />
-                <a href={website} target="_blank" rel="noopener noreferrer">
-                  {" "}
-                  {website}
-                </a>
-                <hr />
-              </>
-            )}
-            <CalendarToday color="primary" />{" "}
-            <span>Joined {dayjs(createdAt).format("MMM YYYY")}</span>
-            <hr />
-            <div>
-              <Tooltip title={followers.length}>
-                <MuiLink
-                  component={Link}
-                  to={`/users/${handle}/followers`}
-                  style={{
-                    marginRight: 20,
-                    color: "unset",
-                    textDecoration: "none",
-                  }}
-                >
-                  <span className="follow-number">
-                    {followers.length < 10000
-                      ? followers.length
-                      : numeral(followers.length).format("0.00a", Math.floor)}
-                  </span>{" "}
-                  <span>followers</span>
-                </MuiLink>
-              </Tooltip>
-              <Tooltip title={following.length}>
-                <MuiLink
-                  component={Link}
-                  to={`/users/${handle}/following`}
-                  style={{ color: "unset", textDecoration: "none" }}
-                >
-                  <span className="follow-number">
-                    {following.length < 10000
-                      ? following.length
-                      : numeral(following.length).format("0.00a", Math.floor)}
-                  </span>{" "}
-                  <span>following</span>
-                </MuiLink>
-              </Tooltip>
-            </div>
+          <div>
+            <Tooltip title={followers.length}>
+              <MuiLink
+                component={Link}
+                to={`/users/${handle}/followers`}
+                style={{
+                  marginRight: 20,
+                  color: "unset",
+                  textDecoration: "none",
+                }}
+              >
+                <span className="follow-number">
+                  {followers.length < 10000
+                    ? followers.length
+                    : numeral(followers.length).format("0.00a", Math.floor)}
+                </span>{" "}
+                <span>followers</span>
+              </MuiLink>
+            </Tooltip>
+            <Tooltip title={following.length}>
+              <MuiLink
+                component={Link}
+                to={`/users/${handle}/following`}
+                style={{ color: "unset", textDecoration: "none" }}
+              >
+                <span className="follow-number">
+                  {following.length < 10000
+                    ? following.length
+                    : numeral(following.length).format("0.00a", Math.floor)}
+                </span>{" "}
+                <span>following</span>
+              </MuiLink>
+            </Tooltip>
           </div>
         </div>
-      </Paper>
-    ) : (
-      <ProfileSkeleton />
-    );
-    return profileMarkup;
-  }
+      </div>
+    </Paper>
+  ) : (
+    <ProfileSkeleton />
+  );
+  return profileMarkup;
 }
 
 const mapStateToProps = (state) => ({ user: state.user });

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 // MUI
 import withStyles from "@material-ui/core/styles/withStyles";
@@ -17,23 +17,18 @@ const styles = {
   },
 };
 
-export class Tag extends Component {
-  render() {
-    const { tagName, classes, removeTag } = this.props;
-    return (
-      <Tooltip title="Click to remove tag">
-        <Button
-          className={classes.tagButton}
-          onClick={() => removeTag(tagName)}
-          variant="contained"
-          style={{ textTransform: "none" }}
-        >
-          {tagName}
-        </Button>
-      </Tooltip>
-    );
-  }
-}
+const Tag = ({ tagName, classes, removeTag }) => (
+  <Tooltip title="Click to remove tag">
+    <Button
+      className={classes.tagButton}
+      onClick={() => removeTag(tagName)}
+      variant="contained"
+      style={{ textTransform: "none" }}
+    >
+      {tagName}
+    </Button>
+  </Tooltip>
+);
 
 Tag.propTypes = {
   tagName: PropTypes.string.isRequired,
