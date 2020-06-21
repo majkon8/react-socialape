@@ -90,7 +90,7 @@ function App() {
             <Route
               exact
               path="/users/:handle/scream/:screamId"
-              component={User}
+              render={(props) => <User {...props} key={Math.random()} />}
             />
             <Redirect from="*" to="/" />
           </Switch>

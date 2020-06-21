@@ -34,7 +34,7 @@ export const getScreams = () => async (dispatch) => {
 };
 
 // Get one scream
-export const getScream = async (screamId) => async (dispatch) => {
+export const getScream = (screamId) => async (dispatch) => {
   dispatch({ type: LOADING_UI });
   try {
     const res = await axios.get(`/scream/${screamId}`);

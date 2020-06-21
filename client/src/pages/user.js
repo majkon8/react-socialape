@@ -19,17 +19,10 @@ function User({
   const [screamIdParam, setScreamIdParam] = useState(null);
 
   useEffect(() => {
-    const handle = match.params.handle;
-    const screamId = match.params.screamId;
-    if (screamId) setScreamIdParam(screamId);
-    getUserData(handle);
-  }, []);
-
-  useEffect(() => {
     const screamId = match.params.screamId;
     const handle = match.params.handle;
     setProfile(null);
-    setScreamIdParam(screamId);
+    if (screamId) setScreamIdParam(screamId);
     getUserData(handle);
   }, [match.params.screamId, match.params.handle]);
 

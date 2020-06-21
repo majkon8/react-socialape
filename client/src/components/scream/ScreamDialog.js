@@ -50,7 +50,9 @@ function ScreamDialog({
   const [open, setOpen] = useState(false);
   const [oldPath, setOldPath] = useState("");
 
-  useEffect(() => openDialog && handleOpen(), []);
+  useEffect(() => {
+    openDialog && handleOpen();
+  }, []);
 
   const handleOpen = () => {
     let oldPath = window.location.pathname;
