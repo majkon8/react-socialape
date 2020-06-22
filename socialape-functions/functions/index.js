@@ -48,7 +48,7 @@ const {
 const FBAuth = require("./middleware/fbAuth");
 const cors = require("cors");
 
-app.use(cors());
+app.use(cors({ origin: true }));
 
 // SCREAM ROUTES
 

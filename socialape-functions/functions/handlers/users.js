@@ -41,6 +41,7 @@ exports.signup = async (req, res) => {
       .signInWithEmailAndPassword(newUser.email, newUser.password);
     const userId = data.user.uid;
     const token = await data.user.getIdToken();
+    const refreshToken = data.user.refreshToken;
     const userCredentials = {
       ...newUser,
       createdAt: new Date().toISOString(),
@@ -52,7 +53,7 @@ exports.signup = async (req, res) => {
     await db.doc(`/users/${newUser.handle}`).set(userCredentials);
     const email = newUser.email;
     const password = newUser.password;
-    return res.status(201).json({ token, email, password });
+    return res.status(201).json({ token, email, password, refreshToken });
   } catch (err) {
     console.error(err);
     if (err.code === "auth/email-already-in-use")
@@ -75,9 +76,10 @@ exports.login = async (req, res) => {
       .auth()
       .signInWithEmailAndPassword(user.email, user.password);
     const token = await data.user.getIdToken();
+    const refreshToken = data.user.refreshToken;
     const email = user.email;
     const password = user.password;
-    const userCredentials = { token, email, password };
+    const userCredentials = { token, email, password, refreshToken };
     return res.json(userCredentials);
   } catch (err) {
     console.error(err);
