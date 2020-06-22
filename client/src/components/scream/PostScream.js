@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import MyButton from "../util/MyButton";
 import Tag from "../util/Tag";
 import axios from "axios";
-import { refreshToken } from "../../util";
 // Redux
 import { connect } from "react-redux";
 import { postScream, replyToScream } from "../../redux/actions/dataActions";
@@ -121,7 +120,6 @@ function PostScream({
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    refreshToken();
     replyScreamData
       ? replyToScream({ body, tags, imageUrl, replyScreamData })
       : postScream({ body, tags, imageUrl });

@@ -145,7 +145,9 @@ export const setAuthorizationHeader = (userCredentials) => {
   const FBIdToken = `Bearer ${userCredentials.token}`;
   const userEmail = userCredentials.email;
   const userPassword = userCredentials.password;
+  const FBRefreshToken = userCredentials.refreshToken;
   localStorage.setItem("FBIdToken", FBIdToken);
+  localStorage.setItem("FBRefreshToken", FBRefreshToken);
   if (userEmail && userPassword) {
     localStorage.setItem("userEmail", userEmail);
     localStorage.setItem("userPassword", userPassword);

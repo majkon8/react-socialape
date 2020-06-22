@@ -1,12 +1,11 @@
-import React, { useEffect } from "react";
-import { Route, Switch, Redirect, useLocation } from "react-router-dom";
+import React from "react";
+import { Route, Switch, Redirect } from "react-router-dom";
 import "./App.css";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import themeFile from "./theme";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
-import { refreshToken } from "./util";
 //Redux
 import { Provider } from "react-redux";
 import store from "./redux/store";
@@ -55,15 +54,6 @@ if (token) {
 }
 
 function App() {
-  const location = useLocation();
-
-  useEffect(() => {
-    if (token)
-      setTimeout(() => {
-        refreshToken();
-      }, 2000);
-  }, [location]);
-
   return (
     <MuiThemeProvider theme={theme}>
       <Provider store={store}>
