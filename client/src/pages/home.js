@@ -15,10 +15,10 @@ function Home({ getScreams, data }) {
 
   return (
     <Grid container spacing={2}>
-      <Grid item sm={4} xs={12}>
+      <Grid item md={4} sm={12}>
         <Profile />
       </Grid>
-      <Grid item sm={8} xs={12}>
+      <Grid item md={8} sm={12}>
         <ScreamsDisplay loading={data.loading} screams={data.screams} />
       </Grid>
     </Grid>

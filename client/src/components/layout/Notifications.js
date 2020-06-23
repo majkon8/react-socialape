@@ -116,6 +116,7 @@ function Notifications({ notifications, markNotificationsRead }) {
           aria-owns={anchorEl ? "simple-menu" : undefined}
           aria-haspopup="true"
           onClick={handleOpen}
+          style={{ color: "white" }}
         >
           {notificationIcon}
         </IconButton>
@@ -125,6 +126,7 @@ function Notifications({ notifications, markNotificationsRead }) {
         open={Boolean(anchorEl)}
         onClose={handleClose}
         onExit={onMenuOpened}
+        style={{ marginTop: 30 }}
       >
         {notificationsMarkup}
       </Menu>

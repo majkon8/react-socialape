@@ -10,11 +10,7 @@ import jwtDecode from "jwt-decode";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import { SET_AUTHENTICATED } from "./redux/types";
-import {
-  getUserData,
-  loginUser,
-  logoutUser,
-} from "./redux/actions/userActions";
+import { getUserData } from "./redux/actions/userActions";
 // Components
 import Navbar from "./components/layout/Navbar";
 import AuthRoute from "./components/util/AuthRoute";
@@ -33,24 +29,48 @@ const theme = createMuiTheme(themeFile);
 axios.defaults.baseURL =
   "https://europe-west1-socialape-98946.cloudfunctions.net/api";
 
+axios.interceptors.request.use(async (req) => {
+  let idToken;
+  if (
+    req.headers.common.Authorization &&
+    req.headers.common.Authorization.startsWith("Bearer ")
+  ) {
+    idToken = req.headers.common.Authorization.split("Bearer ")[1];
+    const decodedToken = jwtDecode(idToken);
+    if (decodedToken.exp * 1000 < Date.now()) req = await refreshToken(req);
+  }
+  return req;
+});
+
+async function refreshToken(req) {
+  const APIKey = "AIzaSyCruf7hxmHGvY6AvXNvxC2W4ALYLhhtBUQ";
+  const FBRefreshToken = localStorage.FBRefreshToken;
+  try {
+    const res = await fetch(
+      `https://securetoken.googleapis.com/v1/token?key=${APIKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `grant_type=refresh_token&refresh_token=${FBRefreshToken}`,
+      }
+    );
+    const newTokenData = await res.json();
+    const newIdToken = `Bearer ${newTokenData.id_token}`;
+    localStorage.setItem("FBIdToken", newIdToken);
+    axios.defaults.headers.common["Authorization"] = newIdToken;
+    req.headers.Authorization = newIdToken;
+  } catch (err) {
+    console.log(err);
+  } finally {
+    return req;
+  }
+}
+
 const token = localStorage.FBIdToken;
 if (token) {
-  const decodedToken = jwtDecode(token);
-  if (decodedToken.exp * 1000 < Date.now()) {
-    const email = localStorage.userEmail;
-    const password = localStorage.userPassword;
-    if (localStorage.userEmail && localStorage.userPassword) {
-      const userData = { email, password };
-      store.dispatch(loginUser(userData));
-    } else {
-      store.dispatch(logoutUser());
-      window.location.href = "/login";
-    }
-  } else {
-    store.dispatch({ type: SET_AUTHENTICATED });
-    axios.defaults.headers.common["Authorization"] = token;
-    store.dispatch(getUserData());
-  }
+  store.dispatch({ type: SET_AUTHENTICATED });
+  axios.defaults.headers.common["Authorization"] = token;
+  store.dispatch(getUserData());
 }
 
 function App() {

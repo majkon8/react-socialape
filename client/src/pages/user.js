@@ -4,6 +4,7 @@ import Scream from "../components/scream/Scream";
 import StaticProfile from "../components/profile/StaticProfile";
 import ScreamSkeleton from "../components/util/ScreamSkeleton";
 import ProfileSkeleton from "../components/util/ProfileSkeleton";
+import ScreamsDisplay from "../components/util/ScreamsDisplay";
 // MUI
 import Grid from "@material-ui/core/Grid";
 // Redux
@@ -26,31 +27,21 @@ function User({
     getUserData(handle);
   }, [match.params.screamId, match.params.handle]);
 
-  const screamsMarkup = loading ? (
-    <ScreamSkeleton />
-  ) : screams === null ? (
-    <p>No screams from this user</p>
-  ) : !screamIdParam ? (
-    screams.map((scream) => <Scream key={scream.screamId} scream={scream} />)
-  ) : (
-    screams.map((scream) => {
-      if (scream.screamId !== screamIdParam)
-        return <Scream key={scream.screamId} scream={scream} />;
-      return <Scream key={scream.screamId} scream={scream} openDialog />;
-    })
-  );
-
   return (
     <Grid container spacing={2}>
-      <Grid item sm={4} xs={12}>
+      <Grid item md={4} sm={12}>
         {profile === null ? (
           <ProfileSkeleton />
         ) : (
           <StaticProfile profile={profile} />
         )}
       </Grid>
-      <Grid item sm={8} xs={12}>
-        {screamsMarkup}
+      <Grid item md={8} sm={12}>
+        <ScreamsDisplay
+          loading={loading}
+          screams={screams}
+          screamIdParam={screamIdParam}
+        />
       </Grid>
     </Grid>
   );

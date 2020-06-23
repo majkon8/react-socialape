@@ -40,8 +40,15 @@ function EditDetails({
   const [location, setLocation] = useState("");
   const [open, setOpen] = useState(false);
   const [newPasswordFormIsOpen, setNewPasswordFormIsOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  useEffect(() => mapUserDetailsToState(credentials), []);
+  useEffect(() => {
+    mapUserDetailsToState(credentials);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const handleResize = () => setWindowWidth(window.innerWidth);
 
   const handleOpen = () => {
     setOpen(true);
@@ -115,7 +122,13 @@ function EditDetails({
       >
         <EditIcon color="primary" />
       </MyButton>
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        fullScreen={windowWidth < 600 ? true : false}
+        fullWidth
+        maxWidth="md"
+      >
         <DialogTitle>Edit your details</DialogTitle>
         <DialogContent>
           <form>

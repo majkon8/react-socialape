@@ -26,13 +26,14 @@ import { clearErrors } from "../../redux/actions/uiActions";
 const styles = (theme) => ({
   ...theme.spreadThis,
   profileImage: {
-    maxWidth: 200,
-    height: 200,
+    width: 70,
+    height: 70,
     borderRadius: "50%",
     objectFit: "cover",
+    marginTop: 5,
   },
   dialogContent: { padding: 20 },
-  closeButton: { position: "absolute", left: "90%" },
+  closeButton: { position: "absolute", right: 0 },
   expandButton: { position: "absolute", left: "90%" },
   spinnerDiv: { textAlign: "center", marginTop: 50, marginBottom: 50 },
 });
@@ -49,10 +50,15 @@ function ScreamDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [oldPath, setOldPath] = useState("");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
     openDialog && handleOpen();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const handleResize = () => setWindowWidth(window.innerWidth);
 
   const handleOpen = () => {
     let oldPath = window.location.pathname;
@@ -76,9 +82,13 @@ function ScreamDialog({
       <CircularProgress size={200} thickness={2} />
     </div>
   ) : (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} style={{ marginTop: 10 }}>
       {scream.sharedFromHandle && (
-        <Typography variant="body2" className={classes.shareInfo}>
+        <Typography
+          variant="body2"
+          className={classes.shareInfo}
+          style={{ left: 20 }}
+        >
           <Typography
             variant="body2"
             component={Link}
@@ -96,14 +106,14 @@ function ScreamDialog({
           </Typography>
         </Typography>
       )}
-      <Grid item sm={5}>
+      <Grid item md={2}>
         <img
           src={scream.userImage}
           alt="Profile"
           className={classes.profileImage}
         />
       </Grid>
-      <Grid item sm={7}>
+      <Grid item md={10}>
         <Typography
           component={Link}
           color="primary"
@@ -170,7 +180,12 @@ function ScreamDialog({
       >
         <UnfoldMore color="primary" />
       </MyButton>
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        fullScreen={windowWidth < 600 ? true : false}
+        maxWidth="md"
+      >
         {!UI.loading && (
           <MyButton
             tip="Close"

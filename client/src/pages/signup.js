@@ -38,13 +38,11 @@ function Signup({ classes, user, UI: { loading, errors }, signupUser }) {
   return (
     <Grid container className={classes.form}>
       <Grid item sm />
-      <Grid item sm>
+      <Grid item md={6} sm={10}>
         <img src={AppIcon} alt="monkey" className={classes.image} />
-        <Typography variant="h2" className={classes.pageTitle}>
-          Signup
-        </Typography>
         <form onSubmit={handleSubmit}>
           <TextField
+            variant="outlined"
             id="email"
             name="email"
             type="email"
@@ -57,6 +55,7 @@ function Signup({ classes, user, UI: { loading, errors }, signupUser }) {
             fullWidth
           />
           <TextField
+            variant="outlined"
             id="password"
             name="password"
             type="password"
@@ -69,6 +68,7 @@ function Signup({ classes, user, UI: { loading, errors }, signupUser }) {
             fullWidth
           />
           <TextField
+            variant="outlined"
             id="confirmPassword"
             name="confirmPassword"
             type="password"
@@ -81,6 +81,7 @@ function Signup({ classes, user, UI: { loading, errors }, signupUser }) {
             fullWidth
           />
           <TextField
+            variant="outlined"
             id="handle"
             name="handle"
             type="text"
@@ -103,6 +104,7 @@ function Signup({ classes, user, UI: { loading, errors }, signupUser }) {
             color="primary"
             className={classes.button}
             disabled={loading}
+            style={{ marginTop: 10, width: 100, height: 40 }}
           >
             Signup
             {loading && (

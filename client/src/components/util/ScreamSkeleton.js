@@ -3,25 +3,33 @@ import NoImg from "../../images/no-image.png";
 import PropTypes from "prop-types";
 // MUI
 import Card from "@material-ui/core/Card";
-import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import withStyles from "@material-ui/core/styles/withStyles";
 
 const styles = (theme) => ({
   card: { display: "flex", marginBottom: 20 },
   cardContent: { width: "100%", flexDirection: "column", padding: 25 },
-  cover: { minWidth: 200, objectFit: "cover" },
+  cover: {
+    width: 70,
+    height: 70,
+    objectFit: "cover",
+    borderRadius: 50,
+    diplay: "inline-block",
+  },
   handle: {
-    width: 100,
+    width: 150,
     height: 18,
     backgroundColor: theme.palette.primary.main,
-    marginBottom: 7,
+    marginBottom: 30,
+    marginLeft: 10,
+    display: "inline-block"
   },
   date: {
     height: 14,
     width: 120,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
     marginBottom: 10,
+    marginTop: 5
   },
   fullLine: {
     height: 15,
@@ -40,8 +48,8 @@ const styles = (theme) => ({
 function ScreamSkeleton({ classes }) {
   const content = Array.from({ length: 6 }).map((item, index) => (
     <Card className={classes.card} key={index}>
-      <CardMedia className={classes.cover} image={NoImg} />
       <CardContent className={classes.cardContent}>
+        <img className={classes.cover} src={NoImg} />
         <div className={classes.handle} />
         <div className={classes.date} />
         <div className={classes.fullLine} />

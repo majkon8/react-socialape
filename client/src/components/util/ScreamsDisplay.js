@@ -8,7 +8,7 @@ import Typography from "@material-ui/core/Typography";
 
 const styles = (theme) => ({ ...theme.spreadThis });
 
-function ScreamsDisplay({ loading, screams, classes }) {
+function ScreamsDisplay({ loading, screams, classes, screamIdParam }) {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -28,8 +28,15 @@ function ScreamsDisplay({ loading, screams, classes }) {
   const screamsMarkup = !loading ? (
     screams && screams.length > 0 ? (
       screams.map((scream, index) => {
-        if (index < currentPage * 10)
-          return <Scream key={scream.screamId} scream={scream} />;
+        if (index < currentPage * 10) {
+          return !screamIdParam ? (
+            <Scream key={scream.screamId} scream={scream} />
+          ) : scream.screamId !== screamIdParam ? (
+            <Scream key={scream.screamId} scream={scream} />
+          ) : (
+            <Scream key={scream.screamId} scream={scream} openDialog />
+          );
+        }
         return null;
       })
     ) : (

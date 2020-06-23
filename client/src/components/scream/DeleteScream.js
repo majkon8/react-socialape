@@ -38,7 +38,7 @@ function DeleteScream({ deleteScream, classes, screamId }) {
       >
         <DeleteOutline color="primary" />
       </MyButton>
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle>Are you sure you want to delete this scream?</DialogTitle>
         <DialogActions>
           <Button onClick={handleClose} color="primary">

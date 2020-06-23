@@ -28,7 +28,6 @@ const {
   searchForUser,
   changePassword,
   sendPasswordResetEmail,
-  refreshToken,
 } = require("./handlers/users");
 const {
   handleCreateNotificationOnLike,
@@ -67,7 +66,6 @@ app.post("/scream/reply", FBAuth, replyToScream);
 
 // USERS ROUTES
 
-app.get("/refresh", refreshToken);
 app.post("/signup", signup);
 app.post("/login", login);
 app.post("/user/image", FBAuth, uploadUserImage);

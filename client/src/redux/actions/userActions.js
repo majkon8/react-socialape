@@ -143,21 +143,16 @@ export const sendPasswordResetEmail = (email) => async (dispatch) => {
 // Set auth header
 export const setAuthorizationHeader = (userCredentials) => {
   const FBIdToken = `Bearer ${userCredentials.token}`;
-  const userEmail = userCredentials.email;
-  const userPassword = userCredentials.password;
   const FBRefreshToken = userCredentials.refreshToken;
   localStorage.setItem("FBIdToken", FBIdToken);
   localStorage.setItem("FBRefreshToken", FBRefreshToken);
-  if (userEmail && userPassword) {
-    localStorage.setItem("userEmail", userEmail);
-    localStorage.setItem("userPassword", userPassword);
-  }
   axios.defaults.headers.common["Authorization"] = FBIdToken;
 };
 
 // Logout
 export const logoutUser = () => (dispatch) => {
   localStorage.removeItem("FBIdToken");
+  localStorage.removeItem("FBRefreshToken");
   delete axios.defaults.headers.common["Authorization"];
   dispatch({ type: SET_UNAUTHENTICATED });
 };

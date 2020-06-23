@@ -26,7 +26,7 @@ const styles = (theme) => ({
   ...theme.spreadThis,
   submitButton: { float: "right" },
   progressSpinner: { position: "absolute" },
-  closeButton: { position: "absolute", left: "91%", top: "2%" },
+  closeButton: { position: "absolute", right: "0", top: "0" },
   tagInput: { width: 100 },
   addButton: { marginLeft: 2, position: "relative", bottom: 4 },
   tagsContainer: { display: "flex", flexWrap: "wrap" },
@@ -39,6 +39,7 @@ function PostScream({
   UI,
   classes,
   replyScreamData,
+  showIcon,
 }) {
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState("");
@@ -46,11 +47,16 @@ function PostScream({
   const [currentTag, setCurrentTag] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [loadingImage, setLoadingImage] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const imgInputRef = useRef();
 
   useEffect(() => {
     if (!UI.loading && !UI.errors) handleClose();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [UI.loading]);
+
+  const handleResize = () => setWindowWidth(window.innerWidth);
 
   const uploadScreamImage = async (formData) => {
     setLoadingImage(true);
@@ -146,8 +152,20 @@ function PostScream({
 
   return (
     <>
-      {icon}
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+      {showIcon ? (
+        icon
+      ) : (
+        <p style={{ margin: 0 }} onClick={handleOpen}>
+          Post scream
+        </p>
+      )}
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        fullScreen={windowWidth < 600 ? true : false}
+        fullWidth
+        maxWidth="md"
+      >
         <MyButton
           tip="Close"
           onClick={handleClose}

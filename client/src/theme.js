@@ -13,6 +13,16 @@ export default {
       contrastText: "#fff",
     },
   },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 0,
+      small: 600,
+      md: 800,
+      lg: 1280,
+      xl: 1920,
+    },
+  },
   typography: { useNextVariants: true },
   spreadThis: {
     noData: { textAlign: "center", color: "rgba(0, 0, 0, 0.6)" },
@@ -61,7 +71,14 @@ export default {
       borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
       marginBottom: 20,
     },
-    shareInfo: { position: "absolute", top: 5, left: 225 },
+    shareInfo: {
+      position: "absolute",
+      top: 5,
+      left: 25,
+      background: "rgba(0,0,0,0.1)",
+      padding: 5,
+      borderRadius: 5,
+    },
     replyContent: {
       background: "rgba(0,0,0,0.1)",
       padding: 5,

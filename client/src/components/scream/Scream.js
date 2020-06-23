@@ -13,7 +13,6 @@ import PostScream from "./PostScream";
 // MUI
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 import Dialog from "@material-ui/core/Dialog";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -29,8 +28,17 @@ const styles = (theme) => ({
     position: "relative",
     marginBottom: 20,
     alignItems: "center",
+    width: "100%",
   },
-  image: { minWidth: 200, height: 200 },
+  image: {
+    width: 70,
+    height: 70,
+    display: "inline-block",
+    objectFit: "cover",
+    maxWidth: "100%",
+    borderRadius: "50%",
+    marginRight: 10,
+  },
   content: { padding: 25, objectFit: "cover" },
 });
 
@@ -50,11 +58,6 @@ function Scream({ scream, user, classes, openDialog }) {
 
   return (
     <Card className={classes.card}>
-      <CardMedia
-        image={scream.userImage}
-        title="Profile image"
-        className={classes.image}
-      />
       <CardContent className={classes.content}>
         {scream.sharedFromHandle && (
           <Typography variant="body2" className={classes.shareInfo}>
@@ -75,20 +78,38 @@ function Scream({ scream, user, classes, openDialog }) {
             </Typography>
           </Typography>
         )}
-        <Typography
-          variant="h5"
-          component={Link}
-          to={`/users/${
-            scream.sharedFromHandle
-              ? scream.sharedFromHandle
-              : scream.userHandle
-          }`}
-          color="primary"
+        <div
+          style={{
+            position: "relative",
+            marginTop: scream.sharedFromHandle ? 15 : 0,
+          }}
         >
-          {scream.sharedFromHandle
-            ? scream.sharedFromNickname
-            : scream.userNickname}
-        </Typography>
+          <img
+            src={scream.userImage}
+            title="Profile image"
+            className={classes.image}
+          />
+          <Typography
+            variant="h5"
+            component={Link}
+            to={`/users/${
+              scream.sharedFromHandle
+                ? scream.sharedFromHandle
+                : scream.userHandle
+            }`}
+            style={{
+              top: "50%",
+              position: "absolute",
+              transform: "translateY(-50%)",
+              width: "100%",
+            }}
+            color="primary"
+          >
+            {scream.sharedFromHandle
+              ? scream.sharedFromNickname
+              : scream.userNickname}
+          </Typography>
+        </div>
         {deleteButton}
         <Typography variant="body2" color="textSecondary">
           {dayjs(scream.createdAt).fromNow()}
@@ -157,7 +178,7 @@ function Scream({ scream, user, classes, openDialog }) {
         <span>{scream.shares.length}</span>
         {!scream.sharedScreamId && (
           <>
-            <PostScream replyScreamData={scream} />
+            <PostScream replyScreamData={scream} showIcon />
             <span>{scream.replies.length}</span>
           </>
         )}

@@ -30,13 +30,11 @@ function Login({ classes, loginUser, UI: { loading, errors } }) {
   return (
     <Grid container className={classes.form}>
       <Grid item sm />
-      <Grid item sm>
+      <Grid item md={6} sm={10}>
         <img src={AppIcon} alt="monkey" className={classes.image} />
-        <Typography variant="h2" className={classes.pageTitle}>
-          Login
-        </Typography>
         <form onSubmit={handleSubmit}>
           <TextField
+            variant="outlined"
             id="email"
             name="email"
             type="email"
@@ -49,6 +47,7 @@ function Login({ classes, loginUser, UI: { loading, errors } }) {
             fullWidth
           />
           <TextField
+            variant="outlined"
             id="password"
             name="password"
             type="password"
@@ -71,6 +70,7 @@ function Login({ classes, loginUser, UI: { loading, errors } }) {
             color="primary"
             className={classes.button}
             disabled={loading}
+            style={{marginTop: 10, width: 100, height: 40}}
           >
             Login
             {loading && (

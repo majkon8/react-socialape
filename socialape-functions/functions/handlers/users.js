@@ -9,18 +9,6 @@ const {
 } = require("../util/validators");
 firebase.initializeApp(config);
 
-// Refresh token
-exports.refreshToken = async (req, res) => {
-  const user = firebase.auth().currentUser;
-  try {
-    const token = await user.getIdToken(true);
-    return res.json({ token });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: err.code });
-  }
-};
-
 // User sign up
 exports.signup = async (req, res) => {
   const newUser = {
@@ -51,9 +39,7 @@ exports.signup = async (req, res) => {
       following: [],
     };
     await db.doc(`/users/${newUser.handle}`).set(userCredentials);
-    const email = newUser.email;
-    const password = newUser.password;
-    return res.status(201).json({ token, email, password, refreshToken });
+    return res.status(201).json({ token, refreshToken });
   } catch (err) {
     console.error(err);
     if (err.code === "auth/email-already-in-use")
@@ -77,9 +63,7 @@ exports.login = async (req, res) => {
       .signInWithEmailAndPassword(user.email, user.password);
     const token = await data.user.getIdToken();
     const refreshToken = data.user.refreshToken;
-    const email = user.email;
-    const password = user.password;
-    const userCredentials = { token, email, password, refreshToken };
+    const userCredentials = { token, refreshToken };
     return res.json(userCredentials);
   } catch (err) {
     console.error(err);

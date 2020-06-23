@@ -62,6 +62,7 @@ export const shareScream = (sharedScream) => async (dispatch) => {
   try {
     const res = await axios.post("/scream/share", sharedScream);
     dispatch({ type: SHARE_SCREAM, payload: res.data });
+    dispatch({ type: STOP_LOADING_UI });
   } catch (err) {
     dispatch({ type: SET_ERRORS, payload: err.response.data });
   }
