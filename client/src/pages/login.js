@@ -70,7 +70,7 @@ function Login({ classes, loginUser, UI: { loading, errors } }) {
             color="primary"
             className={classes.button}
             disabled={loading}
-            style={{marginTop: 10, width: 100, height: 40}}
+            style={{ marginTop: 10, width: 100, height: 40 }}
           >
             Login
             {loading && (

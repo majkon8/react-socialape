@@ -6,5 +6,5 @@ module.exports = {
   storageBucket: "socialape-98946.appspot.com",
   messagingSenderId: "1004582260808",
   appId: "1:1004582260808:web:6a475eaa551be6eea4487d",
-  measurementId: "G-81E16T9BRR"
+  measurementId: "G-81E16T9BRR",
 };

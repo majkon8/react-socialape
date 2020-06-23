@@ -22,14 +22,14 @@ const styles = (theme) => ({
     backgroundColor: theme.palette.primary.main,
     marginBottom: 30,
     marginLeft: 10,
-    display: "inline-block"
+    display: "inline-block",
   },
   date: {
     height: 14,
     width: 120,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
     marginBottom: 10,
-    marginTop: 5
+    marginTop: 5,
   },
   fullLine: {
     height: 15,
