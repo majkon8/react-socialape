@@ -35,7 +35,12 @@ const styles = (theme) => ({
   dialogContent: { padding: 20 },
   closeButton: { position: "absolute", right: 0 },
   expandButton: { position: "absolute", left: "90%" },
-  spinnerDiv: { textAlign: "center", marginTop: 50, marginBottom: 50 },
+  spinnerDiv: {
+    textAlign: "center",
+    marginTop: 50,
+    marginBottom: 50,
+    overflow: "hidden",
+  },
 });
 
 function ScreamDialog({

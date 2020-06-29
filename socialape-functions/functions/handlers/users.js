@@ -11,10 +11,8 @@ firebase.initializeApp(config);
 
 // User sign up
 exports.signup = async (req, res) => {
-  const newUser = {
-    ...req.body,
-  };
-  const { valid, errors } = validateSignupData(newUser);
+  const { password, confirmPassword, ...newUser } = req.body;
+  const { valid, errors } = validateSignupData(req.body);
   if (!valid) return res.status(400).json(errors);
   const noImg = "no-image.png";
   try {
@@ -23,10 +21,8 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ handle: "This handle is already taken" });
     const data = await firebase
       .auth()
-      .createUserWithEmailAndPassword(newUser.email, newUser.password);
-    await firebase
-      .auth()
-      .signInWithEmailAndPassword(newUser.email, newUser.password);
+      .createUserWithEmailAndPassword(newUser.email, password);
+    await firebase.auth().signInWithEmailAndPassword(newUser.email, password);
     const userId = data.user.uid;
     const token = await data.user.getIdToken();
     const refreshToken = data.user.refreshToken;
