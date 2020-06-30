@@ -34,7 +34,7 @@ const styles = (theme) => ({
   },
   dialogContent: { padding: 20 },
   closeButton: { position: "absolute", right: 0 },
-  expandButton: { position: "absolute", left: "90%" },
+  expandButton: { position: "absolute", right: 5 },
   spinnerDiv: {
     textAlign: "center",
     marginTop: 50,
@@ -160,7 +160,13 @@ function ScreamDialog({
           </div>
         )}
         <Typography variant="body1">{scream.body}</Typography>
-        {scream.imageUrl && <img src={scream.imageUrl} alt="Scream image" />}
+        {scream.imageUrl && (
+          <img
+            src={scream.imageUrl}
+            style={{ width: "100%", display: "block" }}
+            alt="Scream image"
+          />
+        )}
         <LikeButton screamId={screamId} />
         <span>{scream.likeCount}</span>
         <MyButton tip="comments">

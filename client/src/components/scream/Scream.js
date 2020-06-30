@@ -146,7 +146,7 @@ function Scream({ scream, user, classes, openDialog }) {
                 alt="Scream image"
               />
             </Tooltip>
-            <Dialog open={fullImage} onClose={handleClose}>
+            <Dialog open={fullImage} onClose={handleClose} maxWidth="md">
               <img
                 style={{ width: "100%", height: "auto" }}
                 src={scream.imageUrl}

@@ -14,7 +14,7 @@ import { connect } from "react-redux";
 import { deleteScream } from "../../redux/actions/dataActions";
 
 const styles = {
-  deleteButton: { position: "absolute", left: "90%", top: "10%" },
+  deleteButton: { position: "absolute", right: 5, top: 10 },
 };
 
 function DeleteScream({ deleteScream, classes, screamId }) {
