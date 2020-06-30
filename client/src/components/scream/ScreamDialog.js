@@ -26,14 +26,14 @@ import { clearErrors } from "../../redux/actions/uiActions";
 const styles = (theme) => ({
   ...theme.spreadThis,
   profileImage: {
-    width: 70,
-    height: 70,
+    width: 100,
+    height: 100,
     borderRadius: "50%",
     objectFit: "cover",
     marginTop: 5,
   },
   dialogContent: { padding: 20 },
-  closeButton: { position: "absolute", right: 0 },
+  closeButton: { position: "absolute", right: 10 },
   expandButton: { position: "absolute", right: 5 },
   spinnerDiv: {
     textAlign: "center",

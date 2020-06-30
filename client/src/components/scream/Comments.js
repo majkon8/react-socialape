@@ -13,12 +13,12 @@ import { connect } from "react-redux";
 const styles = (theme) => ({
   ...theme.spreadThis,
   commentImage: {
-    maxWidth: "100%",
+    width: 100,
     height: 100,
     objectFit: "cover",
-    borderRadius: "50%",
+    borderRadius: "100%",
   },
-  commentData: { position: "relative", marginLeft: 20 },
+  commentData: { marginLeft: 20 },
 });
 
 function Comments({
@@ -48,16 +48,16 @@ function Comments({
             ) : null;
           return (
             <Fragment key={createdAt}>
-              <Grid item sm={12}>
+              <Grid item md={12}>
                 <Grid container>
-                  <Grid item sm={2}>
+                  <Grid item md={2}>
                     <img
                       src={userImage}
                       alt="comment"
                       className={classes.commentImage}
                     />
                   </Grid>
-                  <Grid item sm={9}>
+                  <Grid item md={10}>
                     <div className={classes.commentData}>
                       <Typography
                         variant="h5"
