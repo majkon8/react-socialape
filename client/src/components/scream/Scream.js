@@ -64,7 +64,7 @@ function Scream({ scream, user, classes, openDialog }) {
             <Typography
               variant="body2"
               component={Link}
-              to={`/users/${scream.userHandle}/scream/${scream.sharedScreamId}`}
+              to={`/users/${scream.sharedFromHandle}/scream/${scream.sharedScreamId}`}
             >
               Scream
             </Typography>{" "}
