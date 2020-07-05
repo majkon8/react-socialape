@@ -11,11 +11,18 @@ import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 // Redux
 import { connect } from "react-redux";
+import { clearErrors, clearSuccesses } from "../redux/actions/uiActions";
 import { loginUser } from "../redux/actions/userActions";
 
 const styles = (theme) => ({ ...theme.spreadThis });
 
-function Login({ classes, loginUser, UI: { loading, errors } }) {
+function Login({
+  classes,
+  loginUser,
+  UI: { loading, errors },
+  clearErrors,
+  clearSuccesses,
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -72,19 +79,39 @@ function Login({ classes, loginUser, UI: { loading, errors } }) {
             disabled={loading}
             style={{ marginTop: 10, width: 100, height: 40 }}
           >
-            Login
-            {loading && (
+            {" "}
+            {loading ? (
               <CircularProgress size={30} className={classes.progress} />
+            ) : (
+              "Login"
             )}
           </Button>
           <br />
           <br />
           <small>
-            Don't have an account? Signup <Link to="/signup">here</Link>
+            Don't have an account? Signup{" "}
+            <Link
+              onClick={() => {
+                clearErrors();
+                clearSuccesses();
+              }}
+              to="/signup"
+            >
+              here
+            </Link>
           </small>
           <br />
           <small>
-            Forgot your password? Click <Link to="/forgot">here</Link>
+            Forgot your password? Click{" "}
+            <Link
+              onClick={() => {
+                clearErrors();
+                clearSuccesses();
+              }}
+              to="/forgot"
+            >
+              here
+            </Link>
           </small>
         </form>
       </Grid>
@@ -97,10 +124,12 @@ Login.propTypes = {
   classes: PropTypes.object.isRequired,
   loginUser: PropTypes.func.isRequired,
   UI: PropTypes.object.isRequired,
+  clearErrors: PropTypes.func.isRequired,
+  clearSuccesses: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({ UI: state.UI });
-const mapActionsToProps = { loginUser };
+const mapActionsToProps = { loginUser, clearErrors, clearSuccesses };
 
 export default connect(
   mapStateToProps,

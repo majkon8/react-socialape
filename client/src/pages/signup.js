@@ -11,11 +11,18 @@ import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 // Redux
 import { connect } from "react-redux";
+import { clearErrors, clearSuccesses } from "../redux/actions/uiActions";
 import { signupUser } from "../redux/actions/userActions";
 
 const styles = (theme) => ({ ...theme.spreadThis });
 
-function Signup({ classes, user, UI: { loading, errors }, signupUser }) {
+function Signup({
+  classes,
+  UI: { loading, errors },
+  signupUser,
+  clearErrors,
+  clearSuccesses,
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -114,7 +121,16 @@ function Signup({ classes, user, UI: { loading, errors }, signupUser }) {
           <br />
           <br />
           <small>
-            Already have an account? Login <Link to="/login">here</Link>
+            Already have an account? Login{" "}
+            <Link
+              onClick={() => {
+                clearErrors();
+                clearSuccesses();
+              }}
+              to="/login"
+            >
+              here
+            </Link>
           </small>
         </form>
       </Grid>
@@ -125,13 +141,14 @@ function Signup({ classes, user, UI: { loading, errors }, signupUser }) {
 
 Signup.propTypes = {
   classes: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
   UI: PropTypes.object.isRequired,
   signupUser: PropTypes.func.isRequired,
+  clearErrors: PropTypes.func.isRequired,
+  clearSuccesses: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({ user: state.user, UI: state.UI });
-const mapActionsToProps = { signupUser };
+const mapStateToProps = (state) => ({ UI: state.UI });
+const mapActionsToProps = { signupUser, clearErrors, clearSuccesses };
 
 export default connect(
   mapStateToProps,

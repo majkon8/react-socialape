@@ -33,7 +33,7 @@ const styles = (theme) => ({
     marginTop: 5,
   },
   dialogContent: { padding: 20 },
-  closeButton: { position: "absolute", right: 10 },
+  closeButton: { position: "absolute", right: 10, zIndex: 99 },
   expandButton: { position: "absolute", right: 5 },
   spinnerDiv: {
     textAlign: "center",
@@ -97,7 +97,7 @@ function ScreamDialog({
           <Typography
             variant="body2"
             component={Link}
-            to={`/users/${scream.userHandle}/scream/${scream.sharedScreamId}`}
+            to={`/users/${scream.sharedFromHandle}/scream/${scream.sharedScreamId}`}
           >
             Scream
           </Typography>{" "}
@@ -195,6 +195,7 @@ function ScreamDialog({
         open={open}
         onClose={handleClose}
         fullScreen={windowWidth < 600 ? true : false}
+        fullWidth
         maxWidth="md"
       >
         {!UI.loading && (
